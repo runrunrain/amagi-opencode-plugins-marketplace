@@ -28,6 +28,10 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
   assert.match(config.agent["amagi-leader"].prompt, /强编排与模型分层/)
   assert.match(config.agent.luban.prompt, /Task Contract/)
   assert.equal(config.agent.custom.model, "provider/custom")
+  assert.equal(config.mcp.memory.type, "local")
+  assert.deepEqual(config.mcp.memory.command, ["npx", "-y", "@modelcontextprotocol/server-memory"])
+  assert.equal(config.mcp.memory.enabled, false)
+  assert.equal(config.mcp["web-search-prime"].type, "remote")
 })
 
 test("inherit profile leaves models to OpenCode", async () => {
@@ -85,6 +89,40 @@ test("rejects unknown agents in local config", async () => {
   try {
     await assert.rejects(() => AmagiOpenCodePlugin({}, { config: file }), /unknown Amagi agent: unknown/)
   } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test("merges local and opencode MCP overrides without persisting secrets", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-mcp-"))
+  const file = path.join(directory, "amagi-opencode.json")
+  fs.writeFileSync(file, JSON.stringify({
+    mcp: {
+      "web-search-prime": { enabled: true, timeout: 15000 },
+      "tavily-mcp": { enabled: true, environment: { DEFAULT_PARAMETERS: "search_depth=basic" } }
+    }
+  }))
+  const previousConfig = process.env.AMAGI_OPENCODE_CONFIG
+  const previousKey = process.env.ZHIPU_MCP_API_KEY
+  process.env.AMAGI_OPENCODE_CONFIG = file
+  process.env.ZHIPU_MCP_API_KEY = "test-key"
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, {})
+    const config = { mcp: { "web-search-prime": { enabled: false, headers: { "X-User": "keep" } } } }
+    await hooks.config(config)
+
+    assert.equal(config.mcp["web-search-prime"].enabled, false)
+    assert.equal(config.mcp["web-search-prime"].timeout, 15000)
+    assert.equal(config.mcp["web-search-prime"].headers.Authorization, "Bearer test-key")
+    assert.equal(config.mcp["web-search-prime"].headers["X-User"], "keep")
+    assert.equal(config.mcp["tavily-mcp"].enabled, true)
+    assert.equal(config.mcp["tavily-mcp"].environment.TAVILY_API_KEY, "")
+    assert.equal(config.mcp["tavily-mcp"].environment.DEFAULT_PARAMETERS, "search_depth=basic")
+  } finally {
+    if (previousConfig === undefined) delete process.env.AMAGI_OPENCODE_CONFIG
+    else process.env.AMAGI_OPENCODE_CONFIG = previousConfig
+    if (previousKey === undefined) delete process.env.ZHIPU_MCP_API_KEY
+    else process.env.ZHIPU_MCP_API_KEY = previousKey
     fs.rmSync(directory, { recursive: true, force: true })
   }
 })

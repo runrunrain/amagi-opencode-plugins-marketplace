@@ -39,6 +39,31 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 
 可用 `AMAGI_OPENCODE_CONFIG=/absolute/file.json` 指定其他配置文件。
 
+## MCP
+
+插件会注册 `memory`、`web-search-prime`、`zread`、`web-reader`、`tavily-mcp` 和 `firecrawl-mcp`，但默认全部禁用，避免未配置凭据或不需要的 MCP 工具占用上下文。
+
+在 `~/.config/opencode/amagi-opencode.json` 中按需启用；密钥使用环境变量，不要写入 Git 仓库或配置文件：
+
+```json
+{
+  "mcp": {
+    "memory": {"enabled": true},
+    "web-search-prime": {"enabled": true},
+    "tavily-mcp": {"enabled": true},
+    "firecrawl-mcp": {"enabled": true}
+  }
+}
+```
+
+```bash
+export ZHIPU_MCP_API_KEY='...'
+export TAVILY_API_KEY='...'
+export FIRECRAWL_API_KEY='...'
+```
+
+优先级从低到高：插件内置 MCP 定义、`amagi-opencode.json.mcp`、`opencode.json.mcp`。后两层可以覆盖 `enabled`、`headers`、`environment` 或 `timeout`。
+
 ## 运行时结构
 
 | 层级 | 默认模型 | Agent |

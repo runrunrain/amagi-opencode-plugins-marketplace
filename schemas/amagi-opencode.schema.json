@@ -30,6 +30,13 @@
         "enum": ["amagi-leader", "baize", "wenqu", "luban", "luoshen", "laojun", "wukong", "cangjie", "taibai", "fuxi", "diting", "puti", "hongjun"]
       },
       "additionalProperties": {"$ref": "#/$defs/modelOverride"}
+    },
+    "mcp": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["memory", "web-search-prime", "zread", "web-reader", "tavily-mcp", "firecrawl-mcp"]
+      },
+      "additionalProperties": {"$ref": "#/$defs/mcpOverride"}
     }
   },
   "$defs": {
@@ -42,6 +49,16 @@
         "temperature": {"type": ["number", "null"]},
         "top_p": {"type": ["number", "null"]},
         "steps": {"type": ["integer", "null"], "minimum": 1}
+      },
+      "additionalProperties": true
+    },
+    "mcpOverride": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "headers": {"type": "object", "additionalProperties": {"type": "string"}},
+        "environment": {"type": "object", "additionalProperties": {"type": "string"}},
+        "timeout": {"type": "integer", "minimum": 1}
       },
       "additionalProperties": true
     }

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url"
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const specification = readJson("manifest/agents.json")
+const mcpSpecification = readJson("mcp/servers.json")
 const instructionNames = [
   "00-baseline.md",
   "10-orchestration.md",
@@ -47,7 +48,7 @@ function resolveProfile(options, userConfig) {
 }
 
 function validateOverrides(userConfig) {
-  const allowedKeys = new Set(["$schema", "profile", "default_agent", "tiers", "agents"])
+  const allowedKeys = new Set(["$schema", "profile", "default_agent", "tiers", "agents", "mcp"])
   const tierNames = new Set(["leader", "expert", "worker", "fast"])
   const agentNames = new Set(Object.keys(specification.agents))
   for (const key of Object.keys(userConfig)) {
@@ -59,7 +60,7 @@ function validateOverrides(userConfig) {
   if (userConfig.default_agent !== undefined && userConfig.default_agent !== false && typeof userConfig.default_agent !== "string") {
     throw new Error("Amagi default_agent must be a string or false")
   }
-  for (const key of ["tiers", "agents"]) {
+  for (const key of ["tiers", "agents", "mcp"]) {
     const value = userConfig[key]
     if (value !== undefined && (!value || typeof value !== "object" || Array.isArray(value))) {
       throw new Error(`Amagi ${key} must be an object`)
@@ -72,6 +73,10 @@ function validateOverrides(userConfig) {
   for (const [name, value] of Object.entries(userConfig.agents || {})) {
     if (!agentNames.has(name)) throw new Error(`unknown Amagi agent: ${name}`)
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`agent ${name} must be an object`)
+  }
+  for (const [name, value] of Object.entries(userConfig.mcp || {})) {
+    if (!Object.hasOwn(mcpSpecification.servers, name)) throw new Error(`unknown Amagi MCP server: ${name}`)
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`MCP server ${name} must be an object`)
   }
 }
 
@@ -115,11 +120,41 @@ function buildAgents(profile, userConfig) {
   )
 }
 
+function resolveEnvironmentTemplates(value) {
+  if (typeof value === "string") {
+    return value.replace(/\{env:([A-Z0-9_]+)\}/g, (_match, name) => process.env[name] || "")
+  }
+  if (Array.isArray(value)) return value.map(resolveEnvironmentTemplates)
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, resolveEnvironmentTemplates(item)]))
+  }
+  return value
+}
+
+function mergeMcp(base, override) {
+  const merged = {
+    ...base,
+    ...(override || {}),
+    headers: { ...(base.headers || {}), ...(override?.headers || {}) },
+    environment: { ...(base.environment || {}), ...(override?.environment || {}) },
+  }
+  if (!Object.keys(merged.headers).length) delete merged.headers
+  if (!Object.keys(merged.environment).length) delete merged.environment
+  return resolveEnvironmentTemplates(merged)
+}
+
+function buildMcp(userConfig) {
+  return Object.fromEntries(
+    Object.entries(mcpSpecification.servers).map(([name, server]) => [name, mergeMcp(server, userConfig.mcp?.[name])]),
+  )
+}
+
 export const AmagiOpenCodePlugin = async (_context, options = {}) => {
   const { data: userConfig } = readUserConfig(options)
   validateOverrides(userConfig)
   const profile = resolveProfile(options, userConfig)
   const agents = buildAgents(profile, userConfig)
+  const mcpServers = buildMcp(userConfig)
 
   return {
     config: async (config) => {
@@ -137,6 +172,11 @@ export const AmagiOpenCodePlugin = async (_context, options = {}) => {
             ...(existing.permission || {}),
           },
         }
+      }
+
+      config.mcp ||= {}
+      for (const [name, managed] of Object.entries(mcpServers)) {
+        config.mcp[name] = mergeMcp(managed, config.mcp[name])
       }
 
       if (!config.default_agent) {
