@@ -22,7 +22,6 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/runrunrain/amagi-opencode-plugins-marketplace/main/schemas/amagi-opencode.schema.json",
   "profile": "tiered",
   "tiers": {
     "leader": {"model": "openai/gpt-5.5", "variant": "high"},
