@@ -16,6 +16,30 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 
 项目级安装时去掉 `--global`。
 
+## 用户模型配置
+
+插件启动时读取 `~/.config/opencode/amagi-opencode.json`。这是稳定的用户覆盖层，不在插件缓存中，更新插件不会覆盖。
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/runrunrain/amagi-opencode-plugins-marketplace/main/schemas/amagi-opencode.schema.json",
+  "profile": "tiered",
+  "tiers": {
+    "leader": {"model": "openai/gpt-5.5", "variant": "high"},
+    "expert": {"model": "openai/gpt-5.5", "variant": "high"},
+    "worker": {"model": "zhipuai/glm-5.2", "variant": "max"},
+    "fast": {"model": "zhipuai/glm-5-turbo", "variant": "high"}
+  },
+  "agents": {
+    "hongjun": {"model": "openai/gpt-5.5-pro"}
+  }
+}
+```
+
+优先级从低到高：插件内置 profile、`tiers`、`agents`、`opencode.json.agent.<name>`。将字段设为 `null` 可移除 profile 继承值；选择 `inherit` profile 可默认让全部 Agent 继承 OpenCode 模型。
+
+可用 `AMAGI_OPENCODE_CONFIG=/absolute/file.json` 指定其他配置文件。
+
 ## 运行时结构
 
 | 层级 | 默认模型 | Agent |

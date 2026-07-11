@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/runrunrain/amagi-opencode-plugins-marketplace/main/schemas/amagi-opencode.schema.json",
+  "title": "Amagi OpenCode Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "profile": {"enum": ["tiered", "inherit"]},
+    "default_agent": {
+      "description": "Agent used only when OpenCode has no default_agent. Set false to leave it unset.",
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"const": false}
+      ]
+    },
+    "tiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "leader": {"$ref": "#/$defs/modelOverride"},
+        "expert": {"$ref": "#/$defs/modelOverride"},
+        "worker": {"$ref": "#/$defs/modelOverride"},
+        "fast": {"$ref": "#/$defs/modelOverride"}
+      }
+    },
+    "agents": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["amagi-leader", "baize", "wenqu", "luban", "luoshen", "laojun", "wukong", "cangjie", "taibai", "fuxi", "diting", "puti", "hongjun"]
+      },
+      "additionalProperties": {"$ref": "#/$defs/modelOverride"}
+    }
+  },
+  "$defs": {
+    "modelOverride": {
+      "type": "object",
+      "description": "OpenCode model fields. Null removes a value inherited from the selected profile.",
+      "properties": {
+        "model": {"type": ["string", "null"]},
+        "variant": {"type": ["string", "null"]},
+        "temperature": {"type": ["number", "null"]},
+        "top_p": {"type": ["number", "null"]},
+        "steps": {"type": ["integer", "null"], "minimum": 1}
+      },
+      "additionalProperties": true
+    }
+  }
+}
