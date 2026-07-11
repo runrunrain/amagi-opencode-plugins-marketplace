@@ -18,7 +18,12 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 
 ## 用户模型配置
 
-插件启动时读取 `~/.config/opencode/amagi-opencode.json`。这是稳定的用户覆盖层，不在插件缓存中，更新插件不会覆盖。
+插件启动时会自动创建并读取用户配置文件。这是稳定的用户覆盖层，不在插件缓存中，更新插件不会覆盖已有文件。
+
+- macOS / Linux：`~/.config/opencode/amagi-opencode.json`（尊重 `XDG_CONFIG_HOME`）
+- Windows：`%APPDATA%\\opencode\\amagi-opencode.json`，没有 `APPDATA` 时回退到 `%LOCALAPPDATA%`
+- `OPENCODE_CONFIG_DIR` 或 `OPENCODE_CONFIG` 已配置时：与该自定义目录或配置文件相邻
+- `AMAGI_OPENCODE_CONFIG`：指定精确文件路径
 
 ```json
 {

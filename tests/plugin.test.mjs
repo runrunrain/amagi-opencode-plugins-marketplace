@@ -4,48 +4,96 @@ import os from "node:os"
 import path from "node:path"
 import test from "node:test"
 
-import { AmagiOpenCodePlugin } from "../index.js"
+import { AmagiOpenCodePlugin, resolveAmagiConfigPath } from "../index.js"
 
 test("registers one leader and twelve tiered subagents at runtime", async () => {
-  const hooks = await AmagiOpenCodePlugin({}, { config: path.join(os.tmpdir(), "amagi-opencode-no-user-config.json") })
-  const config = {
-    agent: {
-      custom: { mode: "primary", model: "provider/custom" },
-      luban: { model: "provider/worker-override" },
-    },
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-defaults-"))
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, { config: path.join(directory, "amagi-opencode.json") })
+    const config = {
+      agent: {
+        custom: { mode: "primary", model: "provider/custom" },
+        luban: { model: "provider/worker-override" },
+      },
+    }
+
+    await hooks.config(config)
+
+    const amagiAgents = Object.keys(config.agent).filter((name) => name !== "custom")
+    assert.equal(amagiAgents.length, 13)
+    assert.equal(config.default_agent, "amagi-leader")
+    assert.equal(config.agent["amagi-leader"].mode, "primary")
+    assert.equal(config.agent["amagi-leader"].model, "openai/gpt-5.6-terra")
+    assert.equal(config.agent.luban.model, "provider/worker-override")
+    assert.equal(config.agent.baize.model, "zhipuai/glm-5-turbo")
+    assert.equal(config.agent.diting.permission.edit, "deny")
+    assert.match(config.agent["amagi-leader"].prompt, /强编排与模型分层/)
+    assert.match(config.agent.luban.prompt, /Task Contract/)
+    assert.equal(config.agent.custom.model, "provider/custom")
+    assert.equal(config.mcp.memory.type, "local")
+    assert.deepEqual(config.mcp.memory.command, ["npx", "-y", "@modelcontextprotocol/server-memory"])
+    assert.equal(config.mcp.memory.enabled, false)
+    assert.equal(config.mcp["web-search-prime"].type, "remote")
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
   }
+})
 
-  await hooks.config(config)
+test("creates a minimal user config once without replacing later edits", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-create-"))
+  const file = path.join(directory, "nested", "amagi-opencode.json")
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, { config: file })
+    assert.ok(fs.existsSync(file))
+    assert.deepEqual(JSON.parse(fs.readFileSync(file, "utf8")), {
+      profile: "tiered",
+      default_agent: "amagi-leader",
+      tiers: {},
+      agents: {},
+      mcp: {},
+    })
 
-  const amagiAgents = Object.keys(config.agent).filter((name) => name !== "custom")
-  assert.equal(amagiAgents.length, 13)
-  assert.equal(config.default_agent, "amagi-leader")
-  assert.equal(config.agent["amagi-leader"].mode, "primary")
-  assert.equal(config.agent["amagi-leader"].model, "openai/gpt-5.6-terra")
-  assert.equal(config.agent.luban.model, "provider/worker-override")
-  assert.equal(config.agent.baize.model, "zhipuai/glm-5-turbo")
-  assert.equal(config.agent.diting.permission.edit, "deny")
-  assert.match(config.agent["amagi-leader"].prompt, /强编排与模型分层/)
-  assert.match(config.agent.luban.prompt, /Task Contract/)
-  assert.equal(config.agent.custom.model, "provider/custom")
-  assert.equal(config.mcp.memory.type, "local")
-  assert.deepEqual(config.mcp.memory.command, ["npx", "-y", "@modelcontextprotocol/server-memory"])
-  assert.equal(config.mcp.memory.enabled, false)
-  assert.equal(config.mcp["web-search-prime"].type, "remote")
+    fs.writeFileSync(file, JSON.stringify({ profile: "inherit", tiers: {}, agents: {}, mcp: {} }))
+    const subsequent = await AmagiOpenCodePlugin({}, { config: file })
+    await subsequent.config({ agent: {} })
+    assert.equal(JSON.parse(fs.readFileSync(file, "utf8")).profile, "inherit")
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test("resolves the user config path on Windows and custom OpenCode paths", () => {
+  assert.equal(
+    resolveAmagiConfigPath({}, { platform: "win32", home: "C:\\Users\\me", environment: { APPDATA: "C:\\Users\\me\\AppData\\Roaming" } }),
+    path.win32.resolve("C:\\Users\\me\\AppData\\Roaming", "opencode", "amagi-opencode.json"),
+  )
+  assert.equal(
+    resolveAmagiConfigPath({}, { platform: "linux", home: "/home/me", environment: { OPENCODE_CONFIG_DIR: "/tmp/opencode" } }),
+    path.resolve("/tmp/opencode", "amagi-opencode.json"),
+  )
+  assert.equal(
+    resolveAmagiConfigPath({}, { platform: "linux", home: "/home/me", environment: { OPENCODE_CONFIG: "/tmp/custom.json" } }),
+    path.resolve("/tmp", "amagi-opencode.json"),
+  )
 })
 
 test("inherit profile leaves models to OpenCode", async () => {
-  const hooks = await AmagiOpenCodePlugin({}, {
-    profile: "inherit",
-    config: path.join(os.tmpdir(), "amagi-opencode-no-user-config.json"),
-  })
-  const config = { default_agent: "custom", agent: {} }
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-inherit-"))
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, {
+      profile: "inherit",
+      config: path.join(directory, "amagi-opencode.json"),
+    })
+    const config = { default_agent: "custom", agent: {} }
 
-  await hooks.config(config)
+    await hooks.config(config)
 
-  assert.equal(config.default_agent, "custom")
-  assert.equal(Object.hasOwn(config.agent.baize, "model"), false)
-  assert.equal(Object.hasOwn(config.agent.luban, "model"), false)
+    assert.equal(config.default_agent, "custom")
+    assert.equal(Object.hasOwn(config.agent.baize, "model"), false)
+    assert.equal(Object.hasOwn(config.agent.luban, "model"), false)
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
 })
 
 test("local config applies tier and agent overrides before opencode.json overrides", async () => {

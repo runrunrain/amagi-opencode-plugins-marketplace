@@ -22,16 +22,43 @@ function readJson(relativePath) {
   return JSON.parse(read(relativePath))
 }
 
-function userConfigPath(options) {
-  if (options.config) return path.resolve(String(options.config))
-  if (process.env.AMAGI_OPENCODE_CONFIG) return path.resolve(process.env.AMAGI_OPENCODE_CONFIG)
-  const configHome = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config")
-  return path.join(configHome, "opencode", "amagi-opencode.json")
+function defaultUserConfig() {
+  return {
+    profile: "tiered",
+    default_agent: specification.leader,
+    tiers: {},
+    agents: {},
+    mcp: {},
+  }
+}
+
+export function resolveAmagiConfigPath(options = {}, runtime = {}) {
+  const environment = runtime.environment || process.env
+  const platform = runtime.platform || process.platform
+  const home = runtime.home || os.homedir()
+  const pathApi = platform === "win32" ? path.win32 : path
+  if (options.config) return pathApi.resolve(String(options.config))
+  if (environment.AMAGI_OPENCODE_CONFIG) return pathApi.resolve(environment.AMAGI_OPENCODE_CONFIG)
+  if (environment.OPENCODE_CONFIG_DIR) return pathApi.resolve(environment.OPENCODE_CONFIG_DIR, "amagi-opencode.json")
+  if (environment.OPENCODE_CONFIG) return pathApi.resolve(pathApi.dirname(environment.OPENCODE_CONFIG), "amagi-opencode.json")
+  if (platform === "win32") {
+    const appData = environment.APPDATA || environment.LOCALAPPDATA
+    if (appData) return pathApi.resolve(appData, "opencode", "amagi-opencode.json")
+  }
+  const configHome = environment.XDG_CONFIG_HOME || pathApi.join(home, ".config")
+  return pathApi.join(configHome, "opencode", "amagi-opencode.json")
 }
 
 function readUserConfig(options) {
-  const file = userConfigPath(options)
-  if (!fs.existsSync(file)) return { file, data: {} }
+  const file = resolveAmagiConfigPath(options)
+  if (!fs.existsSync(file)) {
+    fs.mkdirSync(path.dirname(file), { recursive: true })
+    try {
+      fs.writeFileSync(file, `${JSON.stringify(defaultUserConfig(), null, 2)}\n`, { encoding: "utf8", flag: "wx" })
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error
+    }
+  }
   const data = JSON.parse(fs.readFileSync(file, "utf8"))
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error(`Amagi config root must be an object: ${file}`)
