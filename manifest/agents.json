@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "leader": "amagi-leader",
+  "agents": {
+    "amagi-leader": {
+      "description": "天城强编排 Leader：理解目标、划分任务、选择模型层级、调度 Agent、验收证据并控制交付",
+      "mode": "primary",
+      "tier": "leader",
+      "prompt": "prompts/amagi-leader.md",
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "bash": "allow",
+        "task": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "edit": "deny"
+      }
+    },
+    "baize": {
+      "description": "白泽：轻量快速的代码库探索、依赖定位和只读证据收集",
+      "mode": "subagent",
+      "tier": "fast",
+      "prompt": "prompts/baize.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "deny", "task": "deny"}
+    },
+    "wenqu": {
+      "description": "文曲：轻量快速的外部文档、API 和技术资料检索",
+      "mode": "subagent",
+      "tier": "fast",
+      "prompt": "prompts/wenqu.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow", "edit": "deny", "bash": "deny", "task": "deny"}
+    },
+    "luban": {
+      "description": "鲁班：后端、业务逻辑、功能开发和缺陷修复",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/luban.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+    },
+    "luoshen": {
+      "description": "洛神：UI、交互、视觉系统和前端实现",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/luoshen.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+    },
+    "laojun": {
+      "description": "太上老君：保持行为等价的重构、优化和代码质量治理",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/laojun.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+    },
+    "wukong": {
+      "description": "孙悟空：测试策略、测试实现、边界覆盖和验证执行",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/wukong.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+    },
+    "cangjie": {
+      "description": "仓颉：基于事实和上游产物撰写、整理与维护文档",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/cangjie.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "task": "deny"}
+    },
+    "taibai": {
+      "description": "太白：在授权和质量门通过后执行 Git、分支、提交与版本操作",
+      "mode": "subagent",
+      "tier": "worker",
+      "prompt": "prompts/taibai.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "deny", "task": "deny"}
+    },
+    "fuxi": {
+      "description": "伏羲：复杂架构、接口、数据结构与关键技术决策",
+      "mode": "subagent",
+      "tier": "expert",
+      "prompt": "prompts/fuxi.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow", "edit": "deny", "bash": "deny", "task": "deny"}
+    },
+    "diting": {
+      "description": "谛听：独立代码审核、安全审计、测试证据复核与质量门控",
+      "mode": "subagent",
+      "tier": "expert",
+      "prompt": "prompts/diting.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "webfetch": "allow", "edit": "deny", "task": "deny"}
+    },
+    "puti": {
+      "description": "菩提：大型任务复盘、经验提炼、知识治理和框架改进建议",
+      "mode": "subagent",
+      "tier": "expert",
+      "prompt": "prompts/puti.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "task": "deny"}
+    },
+    "hongjun": {
+      "description": "鸿钧：仅用于显式调用或常规 Agent 多轮失败后的高难度架构、编码与调试兜底",
+      "mode": "subagent",
+      "tier": "expert",
+      "prompt": "prompts/hongjun.md",
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "webfetch": "allow", "websearch": "allow", "task": "deny"}
+    }
+  }
+}

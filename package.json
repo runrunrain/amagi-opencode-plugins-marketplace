@@ -1,0 +1,45 @@
+{
+  "name": "amagi-opencode-plugins-marketplace",
+  "version": "1.0.0",
+  "description": "Amagi multi-model orchestration plugin for OpenCode",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./server": "./index.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node --check index.js && node --test tests/*.test.mjs"
+  },
+  "files": [
+    "index.js",
+    "instructions/",
+    "manifest/",
+    "profiles/",
+    "prompts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20",
+    "opencode": ">=1.17.0"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "agent",
+    "orchestration",
+    "multi-model"
+  ],
+  "author": "Amagi Framework",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/runrunrain/amagi-opencode-plugins-marketplace.git"
+  },
+  "homepage": "https://github.com/runrunrain/amagi-opencode-plugins-marketplace#readme",
+  "bugs": {
+    "url": "https://github.com/runrunrain/amagi-opencode-plugins-marketplace/issues"
+  }
+}

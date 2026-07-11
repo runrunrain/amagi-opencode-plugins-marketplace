@@ -1,0 +1,9 @@
+{
+  "name": "tiered",
+  "tiers": {
+    "leader": {"model": "openai/gpt-5.5", "variant": "high"},
+    "expert": {"model": "openai/gpt-5.5", "variant": "high"},
+    "worker": {"model": "zhipuai/glm-5.2", "variant": "max"},
+    "fast": {"model": "zhipuai/glm-5-turbo", "variant": "high"}
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "inherit",
+  "tiers": {
+    "leader": {},
+    "expert": {},
+    "worker": {},
+    "fast": {}
+  }
+}
