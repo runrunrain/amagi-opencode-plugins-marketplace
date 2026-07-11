@@ -1,6 +1,6 @@
 {
   "name": "amagi-opencode-plugins-marketplace",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Amagi multi-model orchestration plugin for OpenCode",
   "type": "module",
   "main": "./index.js",

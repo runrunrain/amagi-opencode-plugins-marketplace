@@ -21,7 +21,7 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
   assert.equal(amagiAgents.length, 13)
   assert.equal(config.default_agent, "amagi-leader")
   assert.equal(config.agent["amagi-leader"].mode, "primary")
-  assert.equal(config.agent["amagi-leader"].model, "openai/gpt-5.5")
+  assert.equal(config.agent["amagi-leader"].model, "openai/gpt-5.6-terra")
   assert.equal(config.agent.luban.model, "provider/worker-override")
   assert.equal(config.agent.baize.model, "zhipuai/glm-5-turbo")
   assert.equal(config.agent.diting.permission.edit, "deny")

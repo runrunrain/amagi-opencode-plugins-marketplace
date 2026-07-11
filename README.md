@@ -24,13 +24,13 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 {
   "profile": "tiered",
   "tiers": {
-    "leader": {"model": "openai/gpt-5.5", "variant": "high"},
-    "expert": {"model": "openai/gpt-5.5", "variant": "high"},
+    "leader": {"model": "openai/gpt-5.6-terra", "variant": "medium"},
+    "expert": {"model": "openai/gpt-5.6-sol", "variant": "high"},
     "worker": {"model": "zhipuai/glm-5.2", "variant": "max"},
     "fast": {"model": "zhipuai/glm-5-turbo", "variant": "high"}
   },
   "agents": {
-    "hongjun": {"model": "openai/gpt-5.5-pro"}
+    "hongjun": {"model": "openai/gpt-5.6-sol", "variant": "max"}
   }
 }
 ```
@@ -68,8 +68,8 @@ export FIRECRAWL_API_KEY='...'
 
 | 层级 | 默认模型 | Agent |
 |---|---|---|
-| leader | `openai/gpt-5.5` | amagi-leader |
-| expert | `openai/gpt-5.5` | fuxi、diting、puti、hongjun |
+| leader | `openai/gpt-5.6-terra` | amagi-leader |
+| expert | `openai/gpt-5.6-sol` | fuxi、diting、puti、hongjun |
 | worker | `zhipuai/glm-5.2` | luban、luoshen、laojun、wukong、cangjie、taibai |
 | fast | `zhipuai/glm-5-turbo` | baize、wenqu |
 
