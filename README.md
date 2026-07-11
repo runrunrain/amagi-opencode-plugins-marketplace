@@ -27,9 +27,12 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 
 `1.3.0` 曾错误在 Windows 使用 `%APPDATA%\\opencode`。升级到 `1.3.1` 后，若新目标不存在，插件会自动迁移该旧文件到正确位置；已有正确位置文件绝不覆盖。
 
+自动创建的文件包含如下可直接编辑的示例。`tiers` 用于批量覆盖同层 Agent；`agents` 用于只覆盖某一个具名 Agent。示例中的 `hongjun` 已实际生效，若不需要该例外配置可直接删除这一整个条目。
+
 ```json
 {
   "profile": "tiered",
+  "default_agent": "amagi-leader",
   "tiers": {
     "leader": {"model": "openai/gpt-5.6-terra", "variant": "medium"},
     "expert": {"model": "openai/gpt-5.6-sol", "variant": "high"},
@@ -42,13 +45,28 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 }
 ```
 
-优先级从低到高：插件内置 profile、`tiers`、`agents`、`opencode.json.agent.<name>`。将字段设为 `null` 可移除 profile 继承值；选择 `inherit` profile 可默认让全部 Agent 继承 OpenCode 模型。
+要改一个 Agent，只需在 `agents` 中使用 Agent 名作为键。例如将 `hongjun` 改用其他已配置 Provider/模型：
+
+```json
+{
+  "agents": {
+    "hongjun": {
+      "model": "your-provider/your-model",
+      "variant": "high"
+    }
+  }
+}
+```
+
+保留其他顶层字段；该片段是对完整配置文件中 `agents` 字段的替换，不是第二个配置文件。Agent 名可取 `amagi-leader`、`fuxi`、`diting`、`puti`、`hongjun`、`luban`、`luoshen`、`laojun`、`wukong`、`cangjie`、`taibai`、`baize`、`wenqu`。
+
+优先级从低到高：插件内置 profile、`tiers`、`agents`、`opencode.json.agent.<name>`。将字段设为 `null` 可移除 profile 继承值。若要使用 `inherit` profile 让 Agent 继承 OpenCode 模型，同时将 `tiers` 和 `agents` 设为 `{}`，避免这些显式覆盖继续生效。配置文件只会在首次缺失时创建，之后更新插件或重启 OpenCode 都不会覆盖你的修改。
 
 可用 `AMAGI_OPENCODE_CONFIG=/absolute/file.json` 指定其他配置文件。
 
 ## MCP
 
-插件会注册 `memory`、`web-search-prime`、`zread`、`web-reader`、`tavily-mcp` 和 `firecrawl-mcp`，但默认全部禁用，避免未配置凭据或不需要的 MCP 工具占用上下文。
+插件会注册 `memory`、`web-search-prime`、`zread`、`web-reader`、`tavily-mcp` 和 `firecrawl-mcp`。运行时内置默认值全部禁用；首次自动创建的用户配置会按上方模板启用 `web-search-prime`、`zread` 和 `web-reader`，其余保持禁用。按自己的 Provider、网络和凭据情况调整。
 
 在 `~/.config/opencode/amagi-opencode.json` 中按需启用；密钥使用环境变量，不要写入 Git 仓库或配置文件：
 

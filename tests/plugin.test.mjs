@@ -39,7 +39,7 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
   }
 })
 
-test("creates a minimal user config once without replacing later edits", async () => {
+test("creates a documented user config once without replacing later edits", async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-create-"))
   const file = path.join(directory, "nested", "amagi-opencode.json")
   try {
@@ -48,9 +48,26 @@ test("creates a minimal user config once without replacing later edits", async (
     assert.deepEqual(JSON.parse(fs.readFileSync(file, "utf8")), {
       profile: "tiered",
       default_agent: "amagi-leader",
-      tiers: {},
-      agents: {},
-      mcp: {},
+      tiers: {
+        leader: { model: "openai/gpt-5.6-terra", variant: "medium" },
+        expert: { model: "openai/gpt-5.6-sol", variant: "high" },
+        worker: { model: "zhipuai/glm-5.2", variant: "max" },
+        fast: { model: "zhipuai/glm-5-turbo", variant: "high" },
+      },
+      agents: {
+        hongjun: {
+          model: "openai/gpt-5.6-sol",
+          variant: "max",
+        },
+      },
+      mcp: {
+        memory: { enabled: false },
+        "web-search-prime": { enabled: true },
+        zread: { enabled: true },
+        "web-reader": { enabled: true },
+        "tavily-mcp": { enabled: false },
+        "firecrawl-mcp": { enabled: false },
+      },
     })
 
     fs.writeFileSync(file, JSON.stringify({ profile: "inherit", tiers: {}, agents: {}, mcp: {} }))
@@ -80,9 +97,11 @@ test("resolves the user config path on Windows and custom OpenCode paths", () =>
 test("inherit profile leaves models to OpenCode", async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-inherit-"))
   try {
+    const file = path.join(directory, "amagi-opencode.json")
+    fs.writeFileSync(file, JSON.stringify({ profile: "inherit", tiers: {}, agents: {}, mcp: {} }))
     const hooks = await AmagiOpenCodePlugin({}, {
       profile: "inherit",
-      config: path.join(directory, "amagi-opencode.json"),
+      config: file,
     })
     const config = { default_agent: "custom", agent: {} }
 

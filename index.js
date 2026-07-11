@@ -26,9 +26,29 @@ function defaultUserConfig() {
   return {
     profile: "tiered",
     default_agent: specification.leader,
-    tiers: {},
-    agents: {},
-    mcp: {},
+    tiers: {
+      leader: { model: "openai/gpt-5.6-terra", variant: "medium" },
+      expert: { model: "openai/gpt-5.6-sol", variant: "high" },
+      worker: { model: "zhipuai/glm-5.2", variant: "max" },
+      fast: { model: "zhipuai/glm-5-turbo", variant: "high" },
+    },
+    // A concrete per-agent override makes the generated file self-documenting.
+    // It has a higher priority than the agent's tier; users can edit, remove, or
+    // duplicate this entry for any agent listed in README.md.
+    agents: {
+      hongjun: {
+        model: "openai/gpt-5.6-sol",
+        variant: "max",
+      },
+    },
+    mcp: {
+      memory: { enabled: false },
+      "web-search-prime": { enabled: true },
+      zread: { enabled: true },
+      "web-reader": { enabled: true },
+      "tavily-mcp": { enabled: false },
+      "firecrawl-mcp": { enabled: false },
+    },
   }
 }
 
