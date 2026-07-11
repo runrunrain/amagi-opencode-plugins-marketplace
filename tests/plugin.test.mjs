@@ -65,7 +65,7 @@ test("creates a minimal user config once without replacing later edits", async (
 test("resolves the user config path on Windows and custom OpenCode paths", () => {
   assert.equal(
     resolveAmagiConfigPath({}, { platform: "win32", home: "C:\\Users\\me", environment: { APPDATA: "C:\\Users\\me\\AppData\\Roaming" } }),
-    path.win32.resolve("C:\\Users\\me\\AppData\\Roaming", "opencode", "amagi-opencode.json"),
+    path.win32.join("C:\\Users\\me", ".config", "opencode", "amagi-opencode.json"),
   )
   assert.equal(
     resolveAmagiConfigPath({}, { platform: "linux", home: "/home/me", environment: { OPENCODE_CONFIG_DIR: "/tmp/opencode" } }),

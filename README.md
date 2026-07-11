@@ -21,9 +21,11 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 插件启动时会自动创建并读取用户配置文件。这是稳定的用户覆盖层，不在插件缓存中，更新插件不会覆盖已有文件。
 
 - macOS / Linux：`~/.config/opencode/amagi-opencode.json`（尊重 `XDG_CONFIG_HOME`）
-- Windows：`%APPDATA%\\opencode\\amagi-opencode.json`，没有 `APPDATA` 时回退到 `%LOCALAPPDATA%`
+- Windows：`%USERPROFILE%\\.config\\opencode\\amagi-opencode.json`，与 OpenCode 的全局配置路径一致
 - `OPENCODE_CONFIG_DIR` 或 `OPENCODE_CONFIG` 已配置时：与该自定义目录或配置文件相邻
 - `AMAGI_OPENCODE_CONFIG`：指定精确文件路径
+
+`1.3.0` 曾错误在 Windows 使用 `%APPDATA%\\opencode`。升级到 `1.3.1` 后，若新目标不存在，插件会自动迁移该旧文件到正确位置；已有正确位置文件绝不覆盖。
 
 ```json
 {

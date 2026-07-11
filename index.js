@@ -41,16 +41,36 @@ export function resolveAmagiConfigPath(options = {}, runtime = {}) {
   if (environment.AMAGI_OPENCODE_CONFIG) return pathApi.resolve(environment.AMAGI_OPENCODE_CONFIG)
   if (environment.OPENCODE_CONFIG_DIR) return pathApi.resolve(environment.OPENCODE_CONFIG_DIR, "amagi-opencode.json")
   if (environment.OPENCODE_CONFIG) return pathApi.resolve(pathApi.dirname(environment.OPENCODE_CONFIG), "amagi-opencode.json")
-  if (platform === "win32") {
-    const appData = environment.APPDATA || environment.LOCALAPPDATA
-    if (appData) return pathApi.resolve(appData, "opencode", "amagi-opencode.json")
-  }
-  const configHome = environment.XDG_CONFIG_HOME || pathApi.join(home, ".config")
+  const configHome = platform === "win32"
+    ? pathApi.join(home, ".config")
+    : environment.XDG_CONFIG_HOME || pathApi.join(home, ".config")
   return pathApi.join(configHome, "opencode", "amagi-opencode.json")
+}
+
+function legacyWindowsConfigPath(options = {}) {
+  if (process.platform !== "win32") return
+  if (options.config || process.env.AMAGI_OPENCODE_CONFIG || process.env.OPENCODE_CONFIG_DIR || process.env.OPENCODE_CONFIG) return
+  const appData = process.env.APPDATA || process.env.LOCALAPPDATA
+  if (!appData) return
+  return path.join(appData, "opencode", "amagi-opencode.json")
+}
+
+function migrateLegacyWindowsConfig(target, options) {
+  const legacy = legacyWindowsConfigPath(options)
+  if (!legacy || fs.existsSync(target) || !fs.existsSync(legacy)) return
+  fs.mkdirSync(path.dirname(target), { recursive: true })
+  try {
+    fs.renameSync(legacy, target)
+  } catch (error) {
+    if (error?.code !== "EXDEV") throw error
+    fs.copyFileSync(legacy, target, fs.constants.COPYFILE_EXCL)
+    fs.unlinkSync(legacy)
+  }
 }
 
 function readUserConfig(options) {
   const file = resolveAmagiConfigPath(options)
+  migrateLegacyWindowsConfig(file, options)
   if (!fs.existsSync(file)) {
     fs.mkdirSync(path.dirname(file), { recursive: true })
     try {
