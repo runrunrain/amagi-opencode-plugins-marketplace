@@ -1,0 +1,4 @@
+interface:
+  display_name: "同步 OpenCode 插件"
+  short_description: "将 Claude Code 插件转换或增量同步为 OpenCode 插件"
+  default_prompt: "Use $sync-opencode-plugin to convert this Claude Code plugin or synchronize its latest changes into the OpenCode version."

@@ -7,6 +7,9 @@ import { execFileSync } from "node:child_process"
 
 import { AmagiOpenCodePlugin, resolveAmagiConfigPath } from "../index.js"
 
+const packageJson = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"))
+const packageVersionPattern = new RegExp(`Amagi ${packageJson.version.replaceAll(".", "\\.")}`)
+
 test("registers one leader and twelve tiered subagents at runtime", async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-defaults-"))
   try {
@@ -35,7 +38,9 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
     assert.equal(config.agent.diting.permission.task, "deny")
     assert.equal(config.agent.taibai.model, "zhipuai/glm-5-turbo")
     assert.match(config.agent["amagi-leader"].prompt, /攻坚型 harness/)
-    assert.match(config.agent.luban.prompt, /Amagi 1\.5\.161/)
+    assert.match(config.agent.luban.prompt, packageVersionPattern)
+    assert.match(config.agent.luoshen.prompt, /agent-browser/)
+    assert.match(config.agent.luoshen.prompt, /截图并亲自读图/)
     assert.equal(config.agent.custom.model, "provider/custom")
     assert.equal(config.mcp.memory.type, "local")
     assert.deepEqual(config.mcp.memory.command, ["npx", "-y", "@modelcontextprotocol/server-memory"])

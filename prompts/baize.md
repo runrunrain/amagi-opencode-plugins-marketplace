@@ -1,7 +1,7 @@
 # OpenCode 适配说明
 
-本角色定义同步自 Amagi 1.5.161。需要引用 canonical 细则时调用 `amagi_resource`；不要把 `resources/...` 当作当前项目路径。
-工具名按 OpenCode 解释：Browser 能力由当前可用浏览器工具/MCP 承担；SubAgent 不得调用 task。
+本角色定义同步自 Amagi 1.5.164。需要引用 canonical 细则时调用 `amagi_resource`；不要把 `resources/...` 当作当前项目路径。
+工具名按 OpenCode 解释：`agent-browser` 通过 Bash 调用，并遵循其 skill 的快照-引用工作流；SubAgent 不得调用 task。
 
 
 # 白泽（Explorer）· fast 型

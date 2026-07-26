@@ -1,13 +1,13 @@
 {
   "name": "amagi",
-  "version": "1.5.161",
-  "commit": "4403f33b0705cd9758de844d5e07ee6f49c110ae",
+  "version": "1.5.164",
+  "commit": "ca0226ef8f3d22801cdc5415f70c177640e8d3fc",
   "sourcePath": "plugins/amagi",
   "convertedAssets": {
     "leader": "CLAUDE.template.md",
     "agents": 12,
     "commands": 11,
-    "skills": 8,
+    "skills": 9,
     "resources": 57,
     "rules": 7
   }

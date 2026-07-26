@@ -1,12 +1,12 @@
 # Amagi OpenCode Plugin
 
-Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 **Amagi 1.5.161**（commit `4403f33b0705cd9758de844d5e07ee6f49c110ae`）。
+Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 **Amagi 1.5.164**（commit `ca0226ef8f3d22801cdc5415f70c177640e8d3fc`）。
 
 这个版本把 Amagi 的攻坚型协作框架映射为 OpenCode 运行时能力，不需要把文件复制到 `~/.config/opencode`：
 
 - 1 个 primary Leader 与 12 个专业 SubAgent
 - L0 Leader 入口、57 个 canonical 资源/模板、7 条规则
-- 8 个按需加载的 Agent Skill
+- 9 个按需加载的 Agent Skill
 - 11 个 `/command`
 - 6 个 MCP 定义
 - 危险命令、非法 JSON、敏感提交三个原生守卫
@@ -19,13 +19,13 @@ Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 
 全局安装：
 
 ```bash
-opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#main --global
+opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#v1.5.164 --global
 ```
 
 更新：
 
 ```bash
-opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#main --global --force
+opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#v1.5.164 --global --force
 ```
 
 需要 OpenCode >= 1.18.5 和 Node.js >= 20。

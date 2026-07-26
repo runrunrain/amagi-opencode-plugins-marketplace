@@ -1,6 +1,6 @@
 # OpenCode 适配说明
 
-本提示词由 Amagi Claude Code 插件 1.5.161 转换而来。
+本提示词由 Amagi Claude Code 插件 1.5.164 转换而来。
 资源路径不会由 OpenCode 自动展开；需要细则时调用 `amagi_resource`，传资源 ID（推荐）或插件内相对路径。
 OpenCode 的 `agent_team` 表示由 Leader 调度多个可并行 SubAgent；没有原生 P2P 通信，也不要向 task 传递 `isolation`/worktree 参数。
 SubAgent 的 `task` 权限已由插件设为 deny，不得递归分派。

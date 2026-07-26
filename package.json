@@ -1,7 +1,7 @@
 {
   "name": "amagi-opencode-plugins-marketplace",
-  "version": "1.5.161",
-  "description": "Amagi 1.5.161 multi-agent collaboration framework for OpenCode",
+  "version": "1.5.164",
+  "description": "Amagi 1.5.164 multi-agent collaboration framework for OpenCode",
   "type": "module",
   "main": "./index.js",
   "exports": {

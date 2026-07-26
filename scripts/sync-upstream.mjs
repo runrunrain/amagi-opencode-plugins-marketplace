@@ -143,6 +143,27 @@ function adaptPointers(text) {
 const plugin = JSON.parse(read(".claude-plugin/plugin.json"))
 const profile = JSON.parse(read("orchestration-profile.json"))
 
+let commit = "unknown"
+try {
+  const marketplaceRoot = path.resolve(sourceRoot, "..", "..")
+  commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: marketplaceRoot, encoding: "utf8" }).trim()
+} catch {
+  // A source archive may not include Git metadata.
+}
+
+const packageJson = JSON.parse(fs.readFileSync(path.join(repositoryRoot, "package.json"), "utf8"))
+packageJson.version = plugin.version
+packageJson.description = `Amagi ${plugin.version} multi-agent collaboration framework for OpenCode`
+write("package.json", JSON.stringify(packageJson, null, 2))
+
+const packageLock = JSON.parse(fs.readFileSync(path.join(repositoryRoot, "package-lock.json"), "utf8"))
+packageLock.version = plugin.version
+if (!packageLock.packages?.[""]) {
+  throw new Error("OpenCode package-lock.json is missing packages[\"\"]")
+}
+packageLock.packages[""].version = plugin.version
+write("package-lock.json", JSON.stringify(packageLock, null, 2))
+
 resetDirectory("prompts")
 const leaderAdapter = [
   "# OpenCode 适配说明",
@@ -163,7 +184,7 @@ for (const entry of fs.readdirSync(path.join(sourceRoot, "agents"), { withFileTy
     "# OpenCode 适配说明",
     "",
     `本角色定义同步自 Amagi ${plugin.version}。需要引用 canonical 细则时调用 \`amagi_resource\`；不要把 \`resources/...\` 当作当前项目路径。`,
-    "工具名按 OpenCode 解释：Browser 能力由当前可用浏览器工具/MCP 承担；SubAgent 不得调用 task。",
+    "工具名按 OpenCode 解释：`agent-browser` 通过 Bash 调用，并遵循其 skill 的快照-引用工作流；SubAgent 不得调用 task。",
     "",
   ].join("\n")
   write(path.join("prompts", entry.name), `${adapter}\n${adaptPointers(body)}`)
@@ -450,14 +471,6 @@ const convertedServers = {
 }
 write("mcp/servers.json", JSON.stringify({ servers: convertedServers }, null, 2))
 
-let commit = "unknown"
-try {
-  const marketplaceRoot = path.resolve(sourceRoot, "..", "..")
-  commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: marketplaceRoot, encoding: "utf8" }).trim()
-} catch {
-  // A source archive may not include Git metadata.
-}
-
 write(
   "manifest/upstream.json",
   JSON.stringify(
@@ -479,5 +492,20 @@ write(
     2,
   ),
 )
+
+const readmePath = path.join(repositoryRoot, "README.md")
+const readme = fs.readFileSync(readmePath, "utf8")
+const releaseSpec = `github:runrunrain/amagi-opencode-plugins-marketplace#v${plugin.version}`
+const nextReadme = readme
+  .replace(
+    /Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 \*\*Amagi [^*]+\*\*（commit `[^`]+`）。/,
+    `Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 **Amagi ${plugin.version}**（commit \`${commit}\`）。`,
+  )
+  .replace(/- \d+ 个按需加载的 Agent Skill/, `- ${fs.readdirSync(path.join(repositoryRoot, "skills"), { withFileTypes: true }).filter((entry) => entry.isDirectory()).length} 个按需加载的 Agent Skill`)
+  .replace(
+    /github:runrunrain\/amagi-opencode-plugins-marketplace#[^\s'"]+/g,
+    releaseSpec,
+  )
+write("README.md", nextReadme)
 
 console.log(`Synced Amagi ${plugin.version} (${commit.slice(0, 12)}) from ${sourceRoot}`)
