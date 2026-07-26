@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/development-specs-schema.json",
+  "title": "Development Specifications Schema",
+  "description": "开发规范和注意事项 - 从项目实践中总结的经验的JSON Schema定义",
+  "type": "object",
+  "required": [
+    "projectId",
+    "version",
+    "lastUpdated",
+    "specifications",
+    "categories",
+    "metadata"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema引用"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "项目唯一标识符",
+      "pattern": "^[a-z0-9-]+$",
+      "example": "my-awesome-project"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件版本号 (语义化版本)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601格式)",
+      "format": "date",
+      "example": "2025-01-15"
+    },
+    "description": {
+      "type": "string",
+      "description": "开发规范描述",
+      "example": "开发规范和注意事项 - 从项目实践中总结的经验"
+    },
+    "specifications": {
+      "type": "array",
+      "description": "规范条目列表",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "title",
+          "description",
+          "severity"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "规范ID",
+            "pattern": "^spec-[a-z0-9-]+-\\d+$",
+            "example": "spec-code-quality-001"
+          },
+          "category": {
+            "type": "string",
+            "description": "规范分类",
+            "enum": [
+              "代码质量",
+              "安全性",
+              "性能",
+              "测试",
+              "调试"
+            ],
+            "example": "代码质量"
+          },
+          "title": {
+            "type": "string",
+            "description": "规范标题",
+            "minLength": 1,
+            "example": "函数命名规范"
+          },
+          "description": {
+            "type": "string",
+            "description": "规范的详细说明",
+            "minLength": 1
+          },
+          "why": {
+            "type": "string",
+            "description": "为什么需要这个规范（背景和原因）"
+          },
+          "how": {
+            "type": "string",
+            "description": "如何执行这个规范（具体步骤）"
+          },
+          "example": {
+            "type": "string",
+            "description": "代码示例或具体案例"
+          },
+          "antiPattern": {
+            "type": "string",
+            "description": "反面示例（应避免的做法）"
+          },
+          "severity": {
+            "type": "string",
+            "description": "严重程度",
+            "enum": [
+              "error",
+              "warning",
+              "info"
+            ],
+            "default": "warning"
+          },
+          "relatedSpecs": {
+            "type": "array",
+            "description": "相关规范ID列表",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "description": "标签列表",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建日期",
+            "format": "date"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新日期",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "description": "规范分类定义",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "分类ID",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "code-quality"
+          },
+          "name": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "代码质量"
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "代码风格、命名规范、注释要求"
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元数据信息",
+      "properties": {
+        "totalSpecs": {
+          "type": "integer",
+          "description": "规范总数",
+          "minimum": 0
+        },
+        "highPriorityCount": {
+          "type": "integer",
+          "description": "高优先级规范数量",
+          "minimum": 0
+        },
+        "lastReview": {
+          "type": "string",
+          "description": "最后审查日期",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "specCategory": {
+      "type": "object",
+      "description": "规范分类定义",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

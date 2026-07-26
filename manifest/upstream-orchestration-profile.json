@@ -1,0 +1,60 @@
+{
+  "profile": "slim",
+  "positioning": "攻坚型 harness：大需求/复杂问题/疑难 Bug；质量受控优先，编排实现受控",
+  "baseline_assumption": "当代强模型（内化通用工程规范）",
+  "commit_guard": {
+    "block_sensitive_files": [
+      ".env",
+      "*.pem",
+      "*.key",
+      "credentials*",
+      "*secret*",
+      "id_rsa*"
+    ],
+    "block_paths": [
+      "node_modules/",
+      ".git/"
+    ],
+    "max_file_mb": 10
+  },
+  "review_flow": {
+    "max_fix_rounds": 3,
+    "high_risk_requires_diting": true,
+    "review_once_per_diff": true
+  },
+  "agent_types": {
+    "leader": {
+      "agents": [
+        "amagi"
+      ],
+      "model_preference": "高智力高通用（如 claude fable 5 / kimi-k3）"
+    },
+    "work": {
+      "agents": [
+        "luban",
+        "luoshen",
+        "laojun",
+        "wukong",
+        "cangjie"
+      ],
+      "model_preference": "工程编码强、遵循指令（如 glm-5.2）"
+    },
+    "expert": {
+      "agents": [
+        "diting",
+        "fuxi",
+        "puti",
+        "hongjun"
+      ],
+      "model_preference": "推理最强或综合最强"
+    },
+    "fast": {
+      "agents": [
+        "baize",
+        "wenqu",
+        "taibai"
+      ],
+      "model_preference": "速度快、便宜"
+    }
+  }
+}

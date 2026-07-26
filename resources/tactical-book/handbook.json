@@ -1,0 +1,575 @@
+{
+  "version": "10.3",
+  "description": "天城战术手册 - 基于ACE架构的自进化知识库",
+  "lastUpdated": "2026-05-26",
+  "maintainer": "Thinker Agent",
+  "writePermission": "仅Thinker可写入",
+
+  "metadata": {
+    "totalEntries": 53,
+    "categories": 10,
+    "evolutionCycle": 10,
+    "sourceReferences": [
+      "ACE论文 (arXiv:2510.04618)",
+      "Anthropic Building Effective Agents",
+      "Claude Multi-Agent System Prompts"
+    ],
+    "note": "项目特定知识已迁移至项目专属目录，保持核心框架纯净",
+    "defaultLoadPolicy": "默认只加载 active 且 percentile/usage 命中阈值的条目；candidate/dormant/deprecated 只通过索引检索命中后按需读取",
+    "statusCounts": {
+      "active": 41,
+      "candidate": 12,
+      "dormant": 0,
+      "deprecated": 0
+    }
+  },
+
+  "lifecyclePolicy": {
+    "active": "已多次验证且可进入默认高价值加载候选",
+    "candidate": "有证据但样本仍少；仅索引可见，不进入默认加载",
+    "dormant": "长期低命中或适用边界不清；保留历史，默认不加载",
+    "deprecated": "已被更优实践替代；禁止删除，仅保留迁移说明与替代条目",
+    "promotionRule": "candidate 至少经过 1 个额外成功案例和审核证据后可晋升 active",
+    "demotionRule": "出现语义丢失、适用失败或长期未命中时降级 dormant/deprecated"
+  },
+
+  "updatePolicy": {
+    "allowedOperations": ["add", "update-count", "deprecate"],
+    "forbiddenOperations": ["delete", "rewrite", "batch-modify"],
+    "reason": "防止上下文崩溃 - ACE论文显示整体重写会导致准确率下降"
+  },
+
+  "sections": {
+    "framework-prompt-governance": {
+      "id": "FPG",
+      "name": "提示词治理",
+      "description": "Amagi 框架提示词、规则、adapter 与 canonical source 的治理模式",
+      "defaultLoad": false,
+      "entries": [
+        {
+          "id": "TACTIC-PROMPT-DEDUPE-SSOT-20260510",
+          "title": "提示词规则去重的单一真相源切片法",
+          "insight": "先确定 canonical source，再把重复全文改为 canonical 引用；当前层只保留 3-5 条语义不变量，并用行数预算与语义审核证明没有降级。",
+          "example": "workflow-rules.md 删除重复分派表，引用 agent-responsibility-matrix.md，并保留审核、测试证据、文档 artifact、可消费产物落盘 4 条不变量。",
+          "source": "projects-memory/projects/tts-voice-generator/agent-outputs/thinker/20260510-004817-amagi-prompt-dedupe-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-10",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再完成一个 adapter/rules 去重切片且审核通过后可晋升 active",
+            "demotionRule": "若出现语义丢失或 adapter 加载失败则标记 dormant"
+          },
+          "defaultLoad": false,
+          "validationGate": [
+            "required_artifacts 已读取",
+            "canonical 路径存在",
+            "目标文件行数不增加",
+            "重复关键短语消失",
+            "禁止文件未改",
+            "Reviewer pass",
+            "输出 artifact 引用上游路径"
+          ]
+        },
+        {
+          "id": "TACTIC-PROMPT-TRANSCRIPT-DELIMITER-20260518",
+          "title": "生成式 Prompt 的元数据与正文分隔符隔离法",
+          "insight": "当 prompt 同时包含导演信息、上下文和最终可输出正文时，必须用清晰、唯一、靠近末尾的正文分隔符定义可输出区域，并保证分隔符之后不追加任何元数据；否则模型容易把标签、备注或调试信息当作正文输出。",
+          "example": "Gemini TTS prompt 顶部声明 metadata/context are direction only，正文只放在 `#### TRANSCRIPT` 后，且 `#### TRANSCRIPT` 后只包含 transcript；prompts-api 与 production-list bridge 测试均断言 transcript section 隔离。",
+          "source": "projects-memory/projects/tts-voice-generator/agent-outputs/puti/20260518-gemini-tts-consistency-project-improvement/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-18",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再经过一个非 TTS 的 prompt metadata/body 隔离案例验证后可晋升 active",
+            "demotionRule": "若发现分隔符仍导致正文丢失或元数据泄漏朗读，则标记 dormant 并补充适用边界"
+          },
+          "defaultLoad": false,
+          "validationGate": [
+            "正文分隔符唯一",
+            "分隔符后不追加元数据",
+            "测试覆盖 full prompt 与 transcript-only 路径",
+            "桥接/批处理路径同步断言",
+            "Reviewer pass"
+          ]
+        }
+      ]
+    },
+
+    "task-management": {
+      "id": "TM",
+      "name": "任务管理",
+      "description": "任务规划、预算控制和执行管理",
+      "entries": [
+        {
+          "id": "TM-001",
+          "title": "功能清单模式",
+          "insight": "使用JSON格式的功能清单，passes=true/false追踪进度，Agent只能修改passes字段",
+          "example": "{\"id\": \"feat-001\", \"description\": \"xxx\", \"passes\": false}",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TM-002",
+          "title": "一次只做一个功能",
+          "insight": "避免一次实现多个功能，会导致代码截断和不完整状态",
+          "example": "选择一个passes=false的功能 -> 实现 -> 测试 -> 提交 -> 再选下一个",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TM-003",
+          "title": "动手前先算预算",
+          "insight": "动手前必须计算工具调用预算：简单任务5次，普通任务10次，复杂任务15次",
+          "example": "任务复杂度: 普通 -> 预算: 10次工具调用",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TM-DESIGN-CONTRACT-PLAN-EXPANSION-20260526",
+          "title": "执行计划必须由设计合同逐条反推验收与补测任务",
+          "insight": "里程碑计划不能只从功能清单顺推实现任务；当已有架构/设计文档、验收矩阵或安全合同时，应逐条校对设计中的 MUST/SHALL、状态机、错误码、认证边界和证据链要求，并把缺失项反向展开为实现、测试、审核任务。否则实现和测试容易把弱化语义固化为 PASS，例如敏感 prompt 由设计要求 422 阻断却被实现为脱敏后 202 accepted，或 SSE 设计要求 Desktop token 却因 GET 路径豁免而漏验。",
+          "example": "Amagi Auto Quant Trading 较完整里程碑中，执行计划按 Phase 1-6 覆盖测试基础、Tailscale remote node、Monitor UI、业务闭环、OpenCode SSE/Gateway 和最终回归；后续 Reviewer 对照设计文档发现 Agent SSE 的 422 阻断、blocked invariant、Desktop token 校验，以及 Gateway health 分层解析、Approval evidence 查真等合同缺口，驱动计划继续拓展补测和修复，最终 187 tests、148 security tests、17 API smoke、8 browser pages 全部 PASS。",
+          "source": "projects-memory/projects/amagi-auto-quant-trading/agent-outputs/thinker/20260526-milestone-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-26",
+          "status": "candidate",
+          "defaultLoad": false,
+          "lifecycle": {
+            "promotionRule": "再在一个中大型里程碑中通过设计合同反推补齐实现/测试/审核任务并经最终 Reviewer pass 后可晋升 active",
+            "demotionRule": "若任务无设计合同、无安全/验收矩阵或仅为单点小修，则不得套用为强制流程，需保持按需检索"
+          },
+          "validationGate": [
+            "读取需求分析、架构/设计文档、执行计划和上轮审核 artifact",
+            "列出设计合同中的 MUST/SHALL、状态机、错误码、安全边界和证据链要求",
+            "逐项映射到实现任务、自动化测试、API/browser 验证和 Reviewer 检查点",
+            "发现实现或测试弱化设计语义时，先修实现/测试而不是降低设计合同",
+            "最终报告记录哪些设计合同已覆盖、哪些作为 Minor/后续实机项保留"
+          ]
+        }
+      ]
+    },
+
+    "thinking-patterns": {
+      "id": "TP",
+      "name": "思维模式",
+      "description": "结构化思维链和决策框架",
+      "entries": [
+        {
+          "id": "TP-001",
+          "title": "四步思维链",
+          "insight": "评估(审清需求) -> 分类(深度/广度/直接) -> 计划(灵魂拷问) -> 执行(OODA循环)",
+          "example": "1.核心实体是什么? 2.深度优先还是广度? 3.能并行吗? 4.观察-调整-决策-行动",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TP-002",
+          "title": "OODA循环",
+          "insight": "观察(手里有什么) -> 调整(根据新线索调整方向) -> 决策(选择工具) -> 行动(执行) -> 循环5-10次",
+          "example": "每次工具调用后问: 学到了什么? 还缺什么? 下一步是什么?",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TP-003",
+          "title": "蝴蝶循环(5轮反思)",
+          "insight": "第1轮:发生了什么? 第2轮:为什么? 第3轮:怎么做? 第4轮:能泛化吗? 第5轮:规则有效吗?",
+          "example": "错误 -> 根因 -> 修复 -> 抽象规则 -> 验证",
+          "source": "ACE论文",
+          "usageCount": 5,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        }
+      ]
+    },
+
+    "error-patterns": {
+      "id": "EP",
+      "name": "错误模式",
+      "description": "常见错误及其解决方案",
+      "entries": [
+        {
+          "id": "EP-001",
+          "title": "class_name冲突",
+          "insight": "创建新类前必须搜索是否存在同名class_name，否则会导致运行时崩溃",
+          "example": "grep -r \"class_name ClassName\" --include=\"*.gd\"",
+          "source": "项目经验",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "EP-002",
+          "title": "节点空引用",
+          "insight": "访问节点前必须检查存在性：if node and is_instance_valid(node)",
+          "example": "if node and is_instance_valid(node):\n    node.do_something()",
+          "source": "项目经验",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "EP-003",
+          "title": "过早宣布完成",
+          "insight": "不要因为文件存在就宣布完成，必须运行端到端测试验证功能真正可用",
+          "example": "文件存在 != 功能可用; 标记passes=true前必须运行实际测试",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "EP-004",
+          "title": "上下文崩溃",
+          "insight": "永远不要整体重写上下文，使用Delta增量更新。重写会导致信息丢失。",
+          "example": "整体重写 = 上下文崩溃 = 准确率下降",
+          "source": "ACE论文",
+          "usageCount": 4,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "EP-005",
+          "title": "默认值合成误覆盖显式 falsy 配置",
+          "insight": "为 provider 或业务配置注入默认值时，必须区分字段不存在与字段显式存在；合法 falsy 值（如 0、false、空字符串按业务允许时）不能被 truthy 判断误判为空并替换为默认值。",
+          "example": "Gemini TTS 默认 temperature 注入 0.2 时，用 `Object.prototype.hasOwnProperty.call(existingGenerationConfig, \"temperature\")` 保留显式 `temperature = 0`，并通过 API 集成测试断言 provider request body 与 job providerOptions 均保留 0。",
+          "source": "projects-memory/projects/tts-voice-generator/agent-outputs/puti/20260518-gemini-tts-consistency-project-improvement/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-18",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再出现一个非 temperature 的合法 falsy override 案例并验证通过后可晋升 active",
+            "demotionRule": "若业务规则不允许该 falsy 值，则降级并补充字段值域边界"
+          },
+          "validationGate": [
+            "明确列出默认值触发条件",
+            "使用显式存在性判断而非 truthy 判断",
+            "测试覆盖合法 falsy override",
+            "断言外部可观察契约而非只断言实现细节",
+            "Reviewer pass"
+          ]
+        },
+        {
+          "id": "EP-HOMEBREW-UNINSTALL-AUTOREMOVE-20260520",
+          "title": "Homebrew uninstall 自动移除必须用 NO_AUTOREMOVE 显式关闭",
+          "insight": "当 Agent 或应用自动执行 `brew uninstall <formula>` 做清理时，命令目标最小化只能限制显式卸载对象，不能阻止 Homebrew 在 uninstall 后执行 unused dependents autoremove；如业务目标是不影响其他工具链，必须为该 uninstall CommandSpec 注入 `HOMEBREW_NO_AUTOREMOVE=1`，并用 Homebrew 源码或官方说明验证变量语义。`HOMEBREW_NO_INSTALL_CLEANUP=1` 只可作为 install/upgrade/reinstall cleanup 的额外防护，不能替代 uninstall autoremove 开关。",
+          "example": "OpenCode Homebrew stale entry cleanup 中，真实执行 `brew uninstall opencode` 后 Homebrew autoremoved ripgrep/node 等 21 个公式；最终修复是在 `brew uninstall opencode` 的 CommandSpec Env 中同时注入 `HOMEBREW_NO_AUTOREMOVE=1` 与额外防护 `HOMEBREW_NO_INSTALL_CLEANUP=1`，并测试断言 args 精确为 `uninstall opencode`、Env 包含正确变量。",
+          "source": "projects-memory/projects/amagi-codebox/agent-outputs/thinker/20260520-204034-opencode-stale-entry-cleanup-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-20",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再出现一个自动执行 Homebrew uninstall/cleanup 的任务并成功复用该门禁后可晋升 active",
+            "demotionRule": "若 Homebrew 改变 uninstall/autoremove 环境变量语义，需标记 dormant 并补充版本边界"
+          },
+          "defaultLoad": false,
+          "validationGate": [
+            "区分 uninstall autoremove 与 install cleanup 的不同开关",
+            "读取 Homebrew 源码或官方文档确认变量语义",
+            "CommandSpec Env 断言包含 HOMEBREW_NO_AUTOREMOVE=1",
+            "测试断言卸载 args 只包含目标 formula",
+            "真实 destructive brew 命令受任务约束或安全门禁控制",
+            "Reviewer pass"
+          ]
+        },
+        {
+          "id": "EP-NPM-SHEBANG-ENHANCED-ENV-20260521",
+          "title": "GUI 最小 PATH 下 npm shim 版本检测必须显式传增强 Env",
+          "insight": "桌面应用、Agent 或安装器即使已经用增强 PATH 解析到 npm 全局命令，也不能假设后续执行该命令会继承同样的 PATH。若目标入口是 npm shim 或 `*.js`，且 shebang 使用 `#!/usr/bin/env node`，在 Finder/GUI/minimal PATH 启动场景下 `env` 可能找不到 `node`，导致安装成功但版本检测失败。版本检测、安装后验证和 prefix/bin 二次验证执行外部 CLI 时，应在 CommandSpec Env 中显式传入项目统一的 enhanced env，并用最小 PATH + shebang 回归测试验证。",
+          "example": "Codex npm install/reinstall 成功后，`runCodexVersion` 未设置 `Env`，子进程继承 `/usr/bin:/bin:/usr/sbin:/sbin`，`codex.js` 的 `#!/usr/bin/env node` 返回 `env: node: No such file or directory`，最终报 `parse Codex version using --version or -V`；修复是在 Codex version CommandSpec 中加入 `Env: s.buildEnhancedEnv()`，并新增 `TestRunCodexVersionUsesEnhancedEnvForNodeShebang` 验证 Env 非空且 PATH 包含 node 目录。",
+          "source": "projects-memory/projects/amagi-codebox/agent-outputs/thinker/20260521-003133-codex-install-version-parse-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-21",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再出现一个非 Codex 的 npm shim 或 node shebang CLI 版本检测/安装后验证案例成功复用该门禁后可晋升 active",
+            "demotionRule": "若目标 CLI 已改为不依赖 PATH 的原生二进制入口，或项目执行模型不再存在 GUI/minimal PATH 场景，则标记 dormant 并补充边界"
+          },
+          "defaultLoad": false,
+          "validationGate": [
+            "区分命令解析阶段 PATH 与子进程执行阶段 Env",
+            "确认 npm shim 或 JS 入口 shebang 是否依赖 /usr/bin/env node",
+            "CommandSpec Env 显式传入 enhanced env",
+            "最小 PATH 回归测试断言无 enhanced env 时可复现 node 缺失",
+            "修复后断言 Env 非空且 PATH 包含 node/npm 目录",
+            "Reviewer pass"
+          ]
+        },
+        {
+          "id": "EP-PACKAGE-PROVENANCE-SCOPED-CLEANUP-20260521",
+          "title": "包管理器清理前必须先确认安装来源而非只看路径前缀",
+          "insight": "当 CLI 旧入口位于 Homebrew prefix（如 `/opt/homebrew/bin` 或 `/opt/homebrew/lib/node_modules`）时，不能直接推断它是 Homebrew formula。自动清理前必须用可验证证据确认真实安装来源：formula 用 `brew list --versions <name>` / Cellar/opt 结构验证，npm global 用 `npm list -g <pkg> --prefix <prefix>`、symlink realpath 和 package.json manifest 验证。若证据表明旧入口是 Homebrew prefix 下的 npm global 残留，应使用 scoped npm cleanup（`npm uninstall -g <pkg> --prefix <prefix>`）而不是 `brew uninstall`，并在清理后 recheck effective path/version，避免误用包管理器导致无效清理或破坏其他工具链。",
+          "example": "Codex 更新时 npm candidate 已是 `@openai/codex@0.132.0`，但 `/opt/homebrew/bin/codex` 仍指向 `/opt/homebrew/lib/node_modules/@openai/codex` 旧版 `0.125.0`。调研确认 `/opt/homebrew/bin/npm` 已不存在，但 `npm list -g @openai/codex --depth=0 --prefix /opt/homebrew` 能看到旧包，说明它不是 Homebrew formula，而是 Homebrew prefix 下的 npm global 残留；真实清理命令为 `npm uninstall -g @openai/codex --prefix /opt/homebrew`，执行后 `which -a codex` 仅剩用户 npm 入口，`npm list ... --prefix /opt/homebrew` 为空，OpenCode/Claude/Node/brew 均未受影响。",
+          "source": "projects-memory/projects/amagi-codebox/agent-outputs/thinker/20260521-013632-codex-stale-entry-cleanup-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-21",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再出现一个 Homebrew prefix 下非 formula 残留（npm/pip/gem 等）清理任务并成功复用 provenance-first + scoped cleanup 门禁后可晋升 active",
+            "demotionRule": "若目标工具确认为 Homebrew formula 或包管理器 manifest 无法验证真实来源，则不得套用本条，需标记边界或降级"
+          },
+          "defaultLoad": false,
+          "validationGate": [
+            "不能仅凭 /opt/homebrew 或 /usr/local 路径判断为 Homebrew formula",
+            "先用对应包管理器清单、symlink realpath 和 package.json/manifest 证明真实来源",
+            "npm global 残留必须使用 npm uninstall -g <pkg> --prefix <prefix> 或同等 scoped cleanup",
+            "禁止把 npm global 残留交给 brew uninstall 处理",
+            "cleanup 后必须 recheck effective path 不再指向 stale package 且版本等于 healthy candidate",
+            "测试断言 cleanup args 精确、manifest guard 生效、recheck 失败不误报成功",
+            "Reviewer pass 与真实设备或安全沙箱验证"
+          ]
+        },
+        {
+          "id": "EP-PRODUCTION-MOCK-EVIDENCE-ROUTE-MATRIX-20260526",
+          "title": "高风险生产页面必须用路由矩阵清除 mock 事实与假证据",
+          "insight": "在金融、交易、医疗、审批等高风险 UI 中，mock 不只是假数据问题，而是用户信任与安全边界问题。最终验收不能只验证主流程或 API，应先列出所有可达生产路由，再对每个事实型页面执行 source runtime 扫描、production build 扫描和真实浏览器快照三重门禁；任何收益、研究结论、证据文件名、签名、审批记录或可操作入口，若没有后端真相源和 artifact 证据链，必须改为 evidence-gated 空态或禁用态。",
+          "example": "Amagi Auto Quant Trading 自主开发中，Dashboard/Settings/Strategy 等页面已接真实 API 并通过测试，但最终审核新增发现 `/knowledge` 仍展示 `低波 ETF`、`BTR-008.csv`、`REVIEW-003.md`、`SC-009.md` 与假计数 `12/4/3/2/3`；修复后改为分类计数 0、禁用搜索/筛选、无知识卡片/操作按钮，并用 source scan、dist scan、agent-browser `/knowledge` 与多页面 regression 证明假知识已清除，最终复审 PASS。",
+          "source": "projects-memory/projects/amagi-auto-quant-trading/agent-outputs/thinker/20260526-032721-autonomous-development-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-26",
+          "status": "candidate",
+          "defaultLoad": false,
+          "lifecycle": {
+            "promotionRule": "再在一个高风险 UI 或证据型知识/审批页面中复用路由矩阵 + source/dist/browser 三重门禁并经 Reviewer pass 后可晋升 active",
+            "demotionRule": "若项目明确处于纯原型或 fixture 隔离环境，且生产构建不可达 mock 页面，则不得套用为阻断规则，需补充适用边界或降级 dormant"
+          },
+          "validationGate": [
+            "列出所有生产可达路由，而非只验证主导航或主流程",
+            "对事实型页面扫描 runtime source，确认无假收益、假研究结论、假证据、假签名、假审批记录",
+            "对 production build output 扫描相同高风险文本，确认构建产物无残留",
+            "使用真实浏览器访问目标路由并记录空态、禁用态和无操作入口证据",
+            "无后端真相源或 artifact 证据链时必须显示 evidence-gated 空态或禁用态",
+            "修复后由 Tester 回归与 Reviewer 复审双重通过"
+          ]
+        },
+        {
+          "id": "EP-REMOTE-REACHABILITY-LAYERED-HEALTH-20260526",
+          "title": "远程节点可达性不能等价为业务能力健康",
+          "insight": "涉及 Tailscale/VPN/RDP/Gateway/外部设备的远程节点时，网络 connected 或 HTTP 2xx 只能证明某一层可达，不能直接推导业务能力可用。健康模型必须分层表达 reachability、gateway body、关键子系统、capabilities、kill switch、live lock 和 audit mirror；任何缺字段、invalid body、degraded subsystem 或 capability disabled 都应默认 deny，并在 UI 中分别展示事实，避免把 remote connected 误导为 live 可用。",
+          "example": "Amagi Auto Quant Trading 中 `desktop-naalpfc` Tailscale ping 2/2 PASS 只证明 VPN 可达；无 Gateway 时 `/api/qmt/remote/nodes` 保持 unavailable。后续 Gateway `/health` 2xx 不再直接 healthy，而是解析 gateway/qmt/safety/capabilities，invalid JSON、killSwitch、orderDryRun=false、auditMirror unhealthy、xttrader degraded 均 degraded/deny；正常分层健康也只进入 live_locked，`orderLive=false`。",
+          "source": "projects-memory/projects/amagi-auto-quant-trading/agent-outputs/thinker/20260526-milestone-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-26",
+          "status": "candidate",
+          "defaultLoad": false,
+          "lifecycle": {
+            "promotionRule": "再在一个远程设备、VPN 节点、Gateway 或外部执行器集成中复用分层健康 + 默认 deny 并审核通过后可晋升 active",
+            "demotionRule": "若目标只是纯网络诊断且不驱动业务能力/安全动作，则不应强制要求完整业务分层健康"
+          },
+          "validationGate": [
+            "区分网络可达、服务可达、业务子系统健康、capability 和安全锁状态",
+            "HTTP 2xx 或 ping 成功不得直接开放 dry-run/live/执行能力",
+            "invalid body、缺字段、degraded subsystem、kill switch、capability=false 默认 deny",
+            "UI/DTO 使用 blockedReasons/allowedActions 展示分层事实而非合成成功",
+            "测试覆盖无 Gateway、invalid body、degraded subsystem、kill switch、capability disabled 和 live_locked 正常体"
+          ]
+        },
+        {
+          "id": "EP-EVIDENCE-REFERENCE-EXISTENCE-GATE-20260526",
+          "title": "证据引用进入状态机前必须查真实 artifact 存在性",
+          "insight": "任何 approval、knowledge、audit、策略发布或合规决策中提交的 evidence id 不能只做非空/schema 校验；进入 pending、approved、searchable 或可执行状态前，必须逐项查询 artifact store 的真实存在性，并在决策前复核。错误响应和审计 payload 只应返回安全序号、数量、hash 或 blocked reason，不能回显伪造 id、路径或用户输入。",
+          "example": "Amagi Auto Quant Trading Phase 4 初审发现 Approval Evidence Bundle 接收 `missing-artifact-id` 仍返回 201 并创建 pending approval，而 Knowledge 已能查真实 artifact。修复后 Approval create/decision 前调用 `artifactStore.hasArtifact`，missing 与 mixed valid+fake 返回 422，不创建 pending；safeDetails 和 blocked audit 只含 `Evidence artifact #N`、evidenceCount、blockedReasons，不泄露 `fake` 或 `/`，security suite 通过。",
+          "source": "projects-memory/projects/amagi-auto-quant-trading/agent-outputs/thinker/20260526-milestone-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-26",
+          "status": "candidate",
+          "defaultLoad": false,
+          "lifecycle": {
+            "promotionRule": "再在一个证据链/审批/合规/知识 API 中复用 evidence existence gate 并经审核通过后可晋升 active",
+            "demotionRule": "若 evidence id 明确只是外部不可本地查真的 opaque reference，则需改为来源可信度/签名/可解析性门禁，不得误称本地存在性已验证"
+          },
+          "validationGate": [
+            "schema 非空校验之外，逐个 evidence id 查询 artifact store 或可信 registry",
+            "混合真实+伪造 evidence 必须整体阻断，不创建 pending/active 状态",
+            "决策/发布前再次复核 evidence、risk budget、签名等完整性",
+            "错误详情和审计 payload 不回显伪造 id、路径或原始用户输入",
+            "API 层和 service 直接调用均有 missing/mixed evidence 负例测试"
+          ]
+        },
+        {
+          "id": "EP-REDACTION-TAXONOMY-CONTRACT-GAP-20260526",
+          "title": "脱敏规则要用敏感字段分类表反查正则覆盖缺口",
+          "insight": "Agent/SSE/日志/Prompt 的 redaction 不能只看已有正则是否能替换常见 token；必须先建立敏感字段分类表，再正交检查字段别名、分隔符、上下文和入口处理语义。命中敏感 prompt 且设计为 allowSensitivePrompt:false 时，应在入口返回 422 并不保存 accepted snapshot；测试若把脱敏后继续 accepted 固化为 PASS，应视为合同弱化。",
+          "example": "Amagi Auto Quant Trading Phase 5 中，设计要求 sensitive prompt 返回 `422 PROMPT_REDACTION_REQUIRED`，但实现一度将 token/path/account 脱敏后 `202 accepted`，且 `password=xxx` 不在 RedactionService 规则中，被 tester 以正交检查发现为 KG-1。修复后 `password/passwd/pwd` 纳入 token 类规则，`password=...`、`password: ...`、`pwd=...` 均 422 且响应不含 secret；SSE Origin + Desktop token、blocked session invariant 也有负例回归。",
+          "source": "projects-memory/projects/amagi-auto-quant-trading/agent-outputs/thinker/20260526-milestone-reflection/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-26",
+          "status": "candidate",
+          "defaultLoad": false,
+          "lifecycle": {
+            "promotionRule": "再在一个 Agent 事件流、日志脱敏、prompt 网关或 secret scanner 中通过字段分类表发现并修复缺口后可晋升 active",
+            "demotionRule": "若入口允许脱敏后继续处理是明确产品合同且有隔离/最小化存储证明，则需补充边界，不得强制 422"
+          },
+          "validationGate": [
+            "建立敏感字段分类表：token、api key、cookie/session、password/passwd/pwd、account、path、network、key material、prompt marker、diff、stack 等",
+            "对每类字段覆盖 `=`、`:`、空白、大小写、别名和组合输入",
+            "测试断言入口处理语义：422 阻断或合同允许的最小化处理，而非只断言输出被替换",
+            "SSE/API/审计响应不得回显原 secret、token、路径或危险 prompt 原文",
+            "新增真实 gap 后把 known gap 用例转为回归阻断测试"
+          ]
+        }
+      ]
+    },
+
+    "tool-usage": {
+      "id": "TU",
+      "name": "工具使用",
+      "description": "工具使用技巧和策略",
+      "entries": [
+        {
+          "id": "TU-001",
+          "title": "Git清洁状态",
+          "insight": "会话结束时代码库必须可运行，失败时使用git reset --hard回退",
+          "example": "成功: git commit -m 'feat: xxx' | 失败: git reset --hard HEAD",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TU-002",
+          "title": "并行工具调用",
+          "insight": "当操作相互独立时，并行调用多个工具以最大化效率",
+          "example": "并行读取3个文件，而不是顺序读取",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "TU-003",
+          "title": "刹车机制",
+          "insight": "当接近预算上限，或边际收益递减（最近3次调用无新信息）时停止",
+          "example": "到15/20次时开始收尾; 结果无变化时立即停止",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        }
+      ]
+    },
+
+    "collaboration": {
+      "id": "CL",
+      "name": "协作规范",
+      "description": "Agent协作标准和交接准则",
+      "entries": [
+        {
+          "id": "CL-001",
+          "title": "审核循环限制",
+          "insight": "Coder与Reviewer循环最多3轮，超过则上报主上决策",
+          "example": "第1轮 -> 第2轮 -> 第3轮 -> 上报",
+          "source": "初始化",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "CL-002",
+          "title": "高密度委派",
+          "insight": "委派必须包含5要素：具体目标、期望格式、背景上下文、建议起手式、工具边界",
+          "example": "查询: xxx | 格式: 事实清单 | 背景: 分析 | 起手: xxx | 避免: xxx",
+          "source": "Claude Multi-Agent System",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "CL-003",
+          "title": "待反思标记",
+          "insight": "遇到值得记录的经验时使用【待反思】标记，触发Thinker",
+          "example": "【待反思】发现新模式\n- 场景: xxx\n- 发现: xxx\n- 价值: xxx",
+          "source": "初始化",
+          "usageCount": 3,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "CL-004",
+          "title": "知识隔离原则",
+          "insight": "Thinker写入前必须分类：通用知识→核心，项目特定知识→项目目录",
+          "example": "Godot 4知识 -> projects/wuyana/; 思维模式 -> tactical-book/handbook.json",
+          "source": "项目知识隔离实践",
+          "usageCount": 1,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "CL-AUTONOMOUS-COVERAGE-GAP-20260518",
+          "title": "自主模式下关闭低风险非阻断覆盖缺口",
+          "insight": "Reviewer 发现非阻断但明确、低风险、可用轻量测试关闭的覆盖缺口时，自主模式应优先补齐并复审，而不是把可自动验证的小缺口留给主上决策。",
+          "example": "Gemini TTS 一致性任务中，Reviewer 首轮将 `temperature = 0` falsy override 覆盖标为 Minor；后续 P6 仅新增 1 条 API 集成回归测试，定向三文件 111 tests 与全量 server 873 tests 通过，最终审核 pass。",
+          "source": "projects-memory/projects/tts-voice-generator/agent-outputs/puti/20260518-gemini-tts-consistency-project-improvement/reflection-report.md",
+          "usageCount": 1,
+          "addedDate": "2026-05-18",
+          "status": "candidate",
+          "lifecycle": {
+            "promotionRule": "再完成一个自主模式低风险覆盖补齐且未扩大范围的成功案例后可晋升 active",
+            "demotionRule": "若补齐动作引入范围蔓延、业务逻辑改动或测试不稳定，则标记 dormant"
+          },
+          "validationGate": [
+            "缺口由 Reviewer 明确指出且非阻断",
+            "修复仅限测试或低风险验证增强",
+            "不扩大业务实现范围",
+            "定向与必要全量验证通过",
+            "最终 Reviewer pass"
+          ]
+        }
+      ]
+    },
+
+    "startup-sequence": {
+      "id": "SS",
+      "name": "启动序列",
+      "description": "会话初始化和状态恢复",
+      "entries": [
+        {
+          "id": "SS-001",
+          "title": "五步启动流程",
+          "insight": "1.定位(pwd) 2.回忆(进度+git日志) 3.领任务(功能清单) 4.复原(init.sh) 5.验证(基础测试)",
+          "example": "pwd -> cat progress.txt -> git log --oneline -20 -> ./init.sh -> 运行基础测试",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        },
+        {
+          "id": "SS-002",
+          "title": "验证后再开发",
+          "insight": "启动后先验证现有功能正常，再开始写新代码",
+          "example": "运行核心功能测试 -> 全部通过 -> 开始新功能",
+          "source": "Anthropic Long-running Agent",
+          "usageCount": 0,
+          "addedDate": "2025-12-08",
+          "status": "active"
+        }
+      ]
+    }
+  },
+
+  "usageTracking": {
+    "description": "追踪条目使用情况，用于评估价值",
+    "highValueThreshold": 5,
+    "deprecationThreshold": 0,
+    "lastCleanup": null
+  },
+
+  "performanceBaseline": {
+    "source": "ACE论文实验结果",
+    "metrics": {
+      "improvement": "+10.6%-17.0%",
+      "speedImprovement": "延迟降低82.3%-91.5%",
+      "costReduction": "成本降低75%-83.6%"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "task-{YYYYMMDD}-{seq}",
+  "title": "{任务标题}",
+  "date": "{YYYY-MM-DD}",
+  "status": "completed",
+  "type": "feature",
+  "priority": "P1",
+  "description": "{详细描述}",
+  "changes": [
+    {
+      "file": "{path/to/file.py}",
+      "change": "{具体变更说明}",
+      "type": "add | modify | delete"
+    }
+  ],
+  "testResults": {
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0
+  },
+  "insights": ["{洞察1}", "{洞察2}"],
+  "issues": [
+    {
+      "issueId": "{P1-XXX}",
+      "description": "{问题描述}",
+      "priority": "P1",
+      "status": "{待修复|已修复}"
+    }
+  ],
+  "commits": ["{commit-hash}"],
+  "verification": "{验证结果描述，如 PASS / 构建通过 / 测试通过}",
+  "references": ["{相关文档路径或链接}"]
+}

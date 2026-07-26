@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "description": "项目领域知识注册表 - 记录所有已构建的领域知识模块",
+  "loadStrategy": "启动时加载本文件，按需加载具体领域",
+  "summaryFields": ["id", "name", "description", "summary", "priority", "tags", "quickAnswers"],
+  "detailFields": ["path", "modules"],
+  "domains": [
+    {
+      "id": "{domain-id}",
+      "name": "{领域名称}",
+      "description": "{领域简述}",
+      "summary": "{一句话总结该领域的核心价值和覆盖范围}",
+      "path": "domains/{domain-id}/",
+      "modules": ["{src/module-path/}"],
+      "tags": ["{关键词1}", "{关键词2}"],
+      "priority": "high",
+      "itemCount": 0,
+      "lastUpdated": "{YYYY-MM-DD}",
+      "quickAnswers": {
+        "{该领域最常见的问题}": "{直接答案，不超过一行}"
+      }
+    }
+  ],
+  "crossDomainRelations": {
+    "description": "领域间依赖关系，帮助 Agent 理解领域间的数据流和调用链",
+    "relations": [
+      {"from": "{domain-a}", "to": "{domain-b}", "type": "{依赖关系说明}"}
+    ],
+    "readingOrder": "{建议的领域阅读顺序及理由}"
+  }
+}

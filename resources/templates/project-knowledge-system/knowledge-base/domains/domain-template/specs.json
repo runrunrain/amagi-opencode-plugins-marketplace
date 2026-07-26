@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "domainId": "{domain-id}",
+  "description": "{领域名称}开发规范",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "specs": [
+    {
+      "id": "spec-001",
+      "title": "{规范标题}",
+      "category": "{分类}",
+      "description": "{规范说明}",
+      "why": "{为什么需要这个规范}",
+      "how": "{如何遵守}",
+      "example": "{代码示例}",
+      "antiPattern": "{反模式示例}",
+      "severity": "warning",
+      "tags": ["{tag1}"],
+      "createdAt": "{YYYY-MM-DD}"
+    }
+  ]
+}

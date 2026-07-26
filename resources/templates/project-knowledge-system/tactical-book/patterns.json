@@ -1,0 +1,51 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "设计模式应用实践",
+  "patterns": [],
+  "categories": [
+    {
+      "id": "creational",
+      "name": "创建型",
+      "patterns": [
+        "Factory",
+        "Builder",
+        "Singleton",
+        "Prototype"
+      ]
+    },
+    {
+      "id": "structural",
+      "name": "结构型",
+      "patterns": [
+        "Adapter",
+        "Decorator",
+        "Facade",
+        "Proxy",
+        "Composite"
+      ]
+    },
+    {
+      "id": "behavioral",
+      "name": "行为型",
+      "patterns": [
+        "Observer",
+        "Strategy",
+        "Command",
+        "State",
+        "Template"
+      ]
+    },
+    {
+      "id": "architectural",
+      "name": "架构型",
+      "patterns": [
+        "MVC",
+        "MVVM",
+        "Repository",
+        "Dependency Injection"
+      ]
+    }
+  ]
+}

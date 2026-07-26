@@ -1,0 +1,367 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/context-schema.json",
+  "title": "Project Context Schema",
+  "description": "项目上下文汇总 - 主 Agent 加载入口的JSON Schema定义",
+  "type": "object",
+  "required": [
+    "projectId",
+    "projectName",
+    "version",
+    "lastUpdated",
+    "projectInfo",
+    "paths",
+    "autoLoadSections",
+    "environment",
+    "quickReference",
+    "metadata"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema引用"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "项目唯一标识符",
+      "pattern": "^[a-z0-9-]+$",
+      "example": "my-awesome-project"
+    },
+    "projectName": {
+      "type": "string",
+      "description": "项目名称",
+      "minLength": 1,
+      "maxLength": 100,
+      "example": "我的项目"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件版本号 (语义化版本)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601格式)",
+      "format": "date",
+      "example": "2025-01-15"
+    },
+    "description": {
+      "type": "string",
+      "description": "项目描述",
+      "example": "项目上下文汇总 - 主 Agent 加载入口"
+    },
+    "projectInfo": {
+      "type": "object",
+      "description": "项目基本信息",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "项目ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "项目名称"
+        },
+        "type": {
+          "type": "string",
+          "description": "项目类型",
+          "enum": [
+            "web-app",
+            "mobile-app",
+            "api",
+            "library",
+            "tool"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "项目状态",
+          "enum": [
+            "active",
+            "paused",
+            "archived"
+          ]
+        },
+        "techStack": {
+          "type": "array",
+          "description": "技术栈列表",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "React",
+            "Node.js",
+            "MongoDB"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "项目描述"
+        }
+      }
+    },
+    "autoLoadSections": {
+      "type": "array",
+      "description": "自动加载配置的章节",
+      "items": {
+        "type": "object",
+        "required": [
+          "section",
+          "priority",
+          "loadStrategy"
+        ],
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "knowledge-base",
+              "tactical-book",
+              "error-book"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "loadStrategy": {
+            "type": "string",
+            "enum": [
+              "full",
+              "progressive",
+              "on-demand"
+            ]
+          },
+          "filter": {
+            "type": "object",
+            "description": "加载过滤器配置",
+            "properties": {
+              "priority": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                }
+              },
+              "autoLoad": {
+                "type": "boolean"
+              },
+              "percentile": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "status": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "severity": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "critical",
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "description": "各文件路径配置",
+      "required": [
+        "knowledgeBase",
+        "tacticalBook",
+        "errorBook",
+        "config",
+        "memoryMap"
+      ],
+      "properties": {
+        "knowledgeBase": {
+          "type": "string",
+          "description": "知识库索引文件路径",
+          "example": "knowledge-base/index.json"
+        },
+        "tacticalBook": {
+          "type": "string",
+          "description": "战术手册索引文件路径",
+          "example": "tactical-book/index.json"
+        },
+        "errorBook": {
+          "type": "string",
+          "description": "错误手册索引文件路径",
+          "example": "error-book/index.json"
+        },
+        "config": {
+          "type": "string",
+          "description": "配置文件路径",
+          "example": "config.json"
+        },
+        "memoryMap": {
+          "type": "string",
+          "description": "记忆图谱文件路径（精简版，7 sections，<300行）",
+          "example": "memory-map.json"
+        },
+        "taskIndex": {
+          "type": "string",
+          "description": "任务索引文件路径，按需加载",
+          "example": "task-index.json"
+        },
+        "tasksDir": {
+          "type": "string",
+          "description": "任务详情目录路径，按需选择性加载",
+          "example": "tasks/"
+        },
+        "projectContext": {
+          "type": "string",
+          "description": "项目上下文文档路径",
+          "example": "project-context.md"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "环境和工具配置",
+      "properties": {
+        "importantTools": {
+          "type": "array",
+          "description": "重要工具列表",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "description",
+              "important"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "工具名称"
+              },
+              "description": {
+                "type": "string",
+                "description": "工具用途"
+              },
+              "important": {
+                "type": "boolean",
+                "description": "是否为重要工具"
+              },
+              "documentation": {
+                "type": "string",
+                "description": "文档路径"
+              }
+            }
+          }
+        }
+      }
+    },
+    "quickReference": {
+      "type": "object",
+      "description": "快速参考信息",
+      "properties": {
+        "commonCommands": {
+          "type": "array",
+          "description": "常用命令列表",
+          "items": {
+            "type": "object",
+            "required": [
+              "command",
+              "description"
+            ],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "命令"
+              },
+              "description": {
+                "type": "string",
+                "description": "说明"
+              }
+            }
+          }
+        },
+        "commonIssues": {
+          "type": "array",
+          "description": "常见问题列表",
+          "items": {
+            "type": "object",
+            "required": [
+              "issue",
+              "solutionId"
+            ],
+            "properties": {
+              "issue": {
+                "type": "string",
+                "description": "问题描述"
+              },
+              "solutionId": {
+                "type": "string",
+                "description": "解决方案ID",
+                "pattern": "^sol-.*$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元数据信息",
+      "properties": {
+        "totalKnowledgeItems": {
+          "type": "integer",
+          "description": "知识库总条目数",
+          "minimum": 0
+        },
+        "totalTacticalItems": {
+          "type": "integer",
+          "description": "战术手册总条目数",
+          "minimum": 0
+        },
+        "totalErrorItems": {
+          "type": "integer",
+          "description": "错误手册总条目数",
+          "minimum": 0
+        },
+        "lastMigration": {
+          "type": "string",
+          "description": "最后迁移日期",
+          "format": "date"
+        },
+        "migrationSource": {
+          "type": "string",
+          "description": "迁移源",
+          "example": "markdown"
+        }
+      }
+    }
+  }
+}

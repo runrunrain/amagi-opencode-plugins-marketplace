@@ -1,0 +1,39 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "项目约定 - 团队达成共识的技术决策和规范",
+  "conventions": [],
+  "categories": [
+    {
+      "id": "naming",
+      "name": "命名约定",
+      "description": "变量、函数、类、文件命名规范"
+    },
+    {
+      "id": "structure",
+      "name": "目录结构",
+      "description": "代码组织、文件放置规则"
+    },
+    {
+      "id": "architecture",
+      "name": "架构约定",
+      "description": "模块划分、依赖方向、层次结构"
+    },
+    {
+      "id": "communication",
+      "name": "通信约定",
+      "description": "API 设计、事件命名、消息格式"
+    },
+    {
+      "id": "workflow",
+      "name": "工作流程",
+      "description": "开发流程、代码审查、发布规范"
+    }
+  ],
+  "metadata": {
+    "totalConventions": 0,
+    "strictCount": 0,
+    "lastReview": "{YYYY-MM-DD}"
+  }
+}

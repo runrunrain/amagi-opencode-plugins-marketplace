@@ -1,0 +1,33 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "解决方案 - 问题的解决方案和修复方法",
+  "solutions": [],
+  "categories": [
+    {
+      "id": "quick-fix",
+      "name": "快速修复",
+      "description": "快速但可能不是最优的解决方案"
+    },
+    {
+      "id": "workaround",
+      "name": "临时方案",
+      "description": "绕过问题的临时解决方案"
+    },
+    {
+      "id": "permanent-refactor",
+      "name": "永久修复",
+      "description": "彻底解决问题的方案"
+    }
+  ],
+  "statistics": {
+    "totalSolutions": 0,
+    "byApproach": {
+      "quick-fix": 0,
+      "workaround": 0,
+      "permanent-refactor": 0
+    },
+    "highEffectiveness": 0
+  }
+}

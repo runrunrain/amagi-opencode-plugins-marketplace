@@ -1,0 +1,39 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "精妙技巧和方法 - 实战中总结的实用技巧",
+  "techniques": [],
+  "categories": [
+    {
+      "id": "performance",
+      "name": "性能优化",
+      "description": "提升性能的技巧"
+    },
+    {
+      "id": "code-quality",
+      "name": "代码质量",
+      "description": "提升代码可读性和可维护性的技巧"
+    },
+    {
+      "id": "debugging",
+      "name": "调试技巧",
+      "description": "快速定位和解决问题的技巧"
+    },
+    {
+      "id": "security",
+      "name": "安全加固",
+      "description": "提升安全性的技巧"
+    },
+    {
+      "id": "productivity",
+      "name": "效率提升",
+      "description": "提升开发效率的技巧"
+    }
+  ],
+  "metadata": {
+    "totalTechniques": 0,
+    "highEffectiveness": 0,
+    "lastReview": "{YYYY-MM-DD}"
+  }
+}

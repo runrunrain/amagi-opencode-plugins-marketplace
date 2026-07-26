@@ -3,7 +3,7 @@
   "leader": "amagi-leader",
   "agents": {
     "amagi-leader": {
-      "description": "天城强编排 Leader：理解目标、划分任务、选择模型层级、调度 Agent、验收证据并控制交付",
+      "description": "天城攻坚型 Leader：澄清意图、判断任务档、选择执行与审核路径、调度 Agent 并验收证据",
       "mode": "primary",
       "tier": "leader",
       "prompt": "prompts/amagi-leader.md",
@@ -15,92 +15,124 @@
         "task": "allow",
         "webfetch": "allow",
         "websearch": "allow",
-        "edit": "deny"
+        "edit": "allow",
+        "skill": "allow",
+        "amagi_resource": "allow"
       }
     },
     "baize": {
-      "description": "白泽：轻量快速的代码库探索、依赖定位和只读证据收集",
+      "description": "白泽：代码探索、依赖分析与带出处的客观资料收集，不替下游做结论",
       "mode": "subagent",
       "tier": "fast",
       "prompt": "prompts/baize.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "deny", "task": "deny"}
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "bash": "allow",
+        "edit": {"*": "deny", "*agent-outputs/*": "allow"},
+        "skill": "allow",
+        "amagi_resource": "allow",
+        "task": "deny"
+      }
     },
     "wenqu": {
-      "description": "文曲：轻量快速的外部文档、API 和技术资料检索",
+      "description": "文曲：外部文档、API 与技术资料检索，交付来源、置信度和待核验项",
       "mode": "subagent",
       "tier": "fast",
       "prompt": "prompts/wenqu.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow", "edit": "deny", "bash": "deny", "task": "deny"}
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "edit": "deny",
+        "bash": "deny",
+        "skill": "allow",
+        "amagi_resource": "allow",
+        "task": "deny"
+      }
     },
     "luban": {
       "description": "鲁班：后端、业务逻辑、功能开发和缺陷修复",
       "mode": "subagent",
       "tier": "worker",
       "prompt": "prompts/luban.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "luoshen": {
       "description": "洛神：UI、交互、视觉系统和前端实现",
       "mode": "subagent",
       "tier": "worker",
       "prompt": "prompts/luoshen.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "laojun": {
       "description": "太上老君：保持行为等价的重构、优化和代码质量治理",
       "mode": "subagent",
       "tier": "worker",
       "prompt": "prompts/laojun.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "wukong": {
       "description": "孙悟空：测试策略、测试实现、边界覆盖和验证执行",
       "mode": "subagent",
       "tier": "worker",
       "prompt": "prompts/wukong.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "cangjie": {
-      "description": "仓颉：基于事实和上游产物撰写、整理与维护文档",
+      "description": "仓颉：基于事实和上游 artifact 撰写技术与用户文档，并按需查证外部资料",
       "mode": "subagent",
       "tier": "worker",
       "prompt": "prompts/cangjie.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "webfetch": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "taibai": {
-      "description": "太白：在授权和质量门通过后执行 Git、分支、提交与版本操作",
+      "description": "太白：快速、机械地执行经明确授权的 Git、分支、提交与版本操作",
       "mode": "subagent",
-      "tier": "worker",
+      "tier": "fast",
       "prompt": "prompts/taibai.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "deny", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "deny", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "fuxi": {
       "description": "伏羲：复杂架构、接口、数据结构与关键技术决策",
       "mode": "subagent",
       "tier": "expert",
       "prompt": "prompts/fuxi.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow", "edit": "deny", "bash": "deny", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow", "edit": "allow", "bash": "deny", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "diting": {
       "description": "谛听：独立代码审核、安全审计、测试证据复核与质量门控",
       "mode": "subagent",
       "tier": "expert",
       "prompt": "prompts/diting.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "webfetch": "allow", "edit": "deny", "task": "deny"}
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "edit": {"*": "deny", "*agent-outputs/*": "allow"},
+        "skill": "allow",
+        "amagi_resource": "allow",
+        "task": "deny"
+      }
     },
     "puti": {
       "description": "菩提：大型任务复盘、经验提炼、知识治理和框架改进建议",
       "mode": "subagent",
       "tier": "expert",
       "prompt": "prompts/puti.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "deny", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     },
     "hongjun": {
-      "description": "鸿钧：仅用于显式调用或常规 Agent 多轮失败后的高难度架构、编码与调试兜底",
+      "description": "鸿钧：仅在用户显式同意或标准 Agent 多轮失败后启用的高难度架构、编码与调试兜底",
       "mode": "subagent",
       "tier": "expert",
       "prompt": "prompts/hongjun.md",
-      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "webfetch": "allow", "websearch": "allow", "task": "deny"}
+      "permission": {"read": "allow", "glob": "allow", "grep": "allow", "bash": "allow", "edit": "allow", "webfetch": "allow", "websearch": "allow", "skill": "allow", "amagi_resource": "allow", "task": "deny"}
     }
   }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "Amagi Core Index",
+  "sourceStatus": "adapter",
+  "modules": [
+    {"id": "persona", "path": "common/persona.md", "when": "identity and communication"},
+    {"id": "baseline", "path": "common/immutable-baseline.md", "when": "safety or submission"},
+    {"id": "quality", "path": "common/quality-standards.md", "when": "verification or diagnosis"},
+    {"id": "tools", "path": "common/tool-usage-rules.md", "when": "tool or shell usage"},
+    {"id": "subagent", "path": "common/subagent-constraint.md", "when": "SubAgent execution"},
+    {"id": "base-constraints", "path": "common/agent-base-constraints.md", "when": "SubAgent shared base rules or agent type skeletons (leader/work/expert/fast)"},
+    {"id": "output", "path": "common/agent-output-specification.md", "when": "artifact output"},
+    {"id": "agents", "path": "agent-responsibility-matrix.md", "when": "selecting an Agent"},
+    {"id": "workflow", "path": "collaboration/workflow-rules.md", "when": "routing, review, or task contract"},
+    {"id": "subagent-mode", "path": "collaboration/subagent-mode.md", "when": "single-Agent collaboration"},
+    {"id": "team-mode", "path": "collaboration/agent-teams-mode.md", "when": "Agent Teams"},
+    {"id": "paths", "path": "integrations/project-management.md", "when": "project paths"},
+    {"id": "knowledge", "path": "integrations/project-knowledge-system.md", "when": "knowledge loading"}
+  ]
+}

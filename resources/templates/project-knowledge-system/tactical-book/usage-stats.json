@@ -1,0 +1,35 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "战术手册使用频率统计",
+  "statistics": {
+    "totalTechniques": 0,
+    "totalPatterns": 0,
+    "totalSnippets": 0,
+    "totalChecklists": 0,
+    "totalUsage": 0,
+    "highFrequency": 0,
+    "mediumFrequency": 0,
+    "lowFrequency": 0,
+    "neverUsed": 0
+  },
+  "ranking": {
+    "techniques": [],
+    "patterns": [],
+    "snippets": [],
+    "checklists": []
+  },
+  "autoLoadThreshold": 70,
+  "progressiveDisclosure": {
+    "enabled": true,
+    "highFrequencyPercentile": 70,
+    "mediumFrequencyPercentile": 40
+  },
+  "recommendations": [],
+  "metadata": {
+    "trackingEnabled": true,
+    "trackingStartDate": "{YYYY-MM-DD}",
+    "lastCalculation": "{YYYY-MM-DD}"
+  }
+}

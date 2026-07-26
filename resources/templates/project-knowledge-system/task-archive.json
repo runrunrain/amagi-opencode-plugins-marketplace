@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "_archiveStatsNote": "归档统计的单一数据源在 task-index.json 的 archiveStats 字段，本文件不重复维护统计数据",
+  "tasks": [
+    {
+      "id": "task-{YYYYMMDD}-001",
+      "title": "{任务标题}",
+      "date": "{YYYY-MM-DD}",
+      "completedDate": "{YYYY-MM-DD}",
+      "status": "completed",
+      "type": "feature",
+      "priority": "P1",
+      "filePath": "tasks/task-{YYYYMMDD}-001.json",
+      "summary": "{不超过100字的一句话摘要}"
+    }
+  ]
+}

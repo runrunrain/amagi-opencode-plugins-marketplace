@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "domainId": "{domain-id}",
+  "description": "{领域名称} API 参考",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "publicApi": [
+    {
+      "name": "{方法/端点名}",
+      "type": "function",
+      "signature": "{签名}",
+      "description": "{用途}",
+      "parameters": [
+        { "name": "{参数名}", "type": "{类型}", "description": "{说明}" }
+      ],
+      "returns": "{返回值描述}",
+      "usedBy": ["{调用者模块}"]
+    }
+  ],
+  "internalApi": [
+    {
+      "name": "{内部方法名}",
+      "visibility": "private",
+      "description": "{用途}"
+    }
+  ]
+}

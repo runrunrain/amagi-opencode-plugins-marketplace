@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "description": "项目术语中心 - 统一定义跨文件共享的概念，避免术语歧义",
+  "loadStrategy": "高优先级自动加载（启动时加载，确保所有 Agent 共享统一术语定义）",
+  "usage": "其他文件中出现重复概念时，使用 $ref: glossary#termId 引用此文件，避免重复描述",
+  "terms": {
+    "{term-id}": {
+      "id": "{term-id}",
+      "term": "{术语名称}",
+      "definition": "{详细定义}",
+      "aliases": ["{别名1}", "{别名2}"],
+      "category": "{architecture|infrastructure|engine-core|build-system|data-architecture|design-pattern|domain}",
+      "relatedFiles": ["{architecture.json}", "{conventions.json}"]
+    }
+  }
+}

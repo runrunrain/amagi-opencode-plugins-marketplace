@@ -1,0 +1,29 @@
+{
+  "domainId": "{domain-id}",
+  "name": "{领域名称}",
+  "description": "{领域描述}",
+  "version": "1.0",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "modules": ["{src/module-path/}"],
+  "entryPoints": ["{src/module-path/index.ts}"],
+  "quickAnswers": [
+    {
+      "question": "{该领域最常见的问题}",
+      "answer": "{直接答案，不超过3行}",
+      "detailFile": "specs.json"
+    }
+  ],
+  "crossReferences": {
+    "{related-domain-id}": "{该领域与 related-domain-id 的关系说明}",
+    "glossary#{term-id}": "{引用的全局术语说明}"
+  },
+  "commonQueries": [
+    {
+      "query": "{常见查询描述}",
+      "path": "{指向具体文件和章节}",
+      "example": "{查询示例}"
+    }
+  ],
+  "dependencies": [],
+  "tags": ["{关键词1}", "{关键词2}"]
+}

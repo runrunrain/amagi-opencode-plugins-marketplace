@@ -2,14 +2,18 @@
   "servers": {
     "memory": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
       "enabled": false
     },
     "web-search-prime": {
       "type": "remote",
       "url": "https://open.bigmodel.cn/api/mcp/web_search_prime/mcp",
       "headers": {
-        "Authorization": "Bearer {env:ZHIPU_MCP_API_KEY}"
+        "Authorization": "Bearer {env:ZHIPU_API_KEY}"
       },
       "enabled": false,
       "oauth": false
@@ -18,7 +22,7 @@
       "type": "remote",
       "url": "https://open.bigmodel.cn/api/mcp/zread/mcp",
       "headers": {
-        "Authorization": "Bearer {env:ZHIPU_MCP_API_KEY}"
+        "Authorization": "Bearer {env:ZHIPU_API_KEY}"
       },
       "enabled": false,
       "oauth": false
@@ -27,22 +31,31 @@
       "type": "remote",
       "url": "https://open.bigmodel.cn/api/mcp/web_reader/mcp",
       "headers": {
-        "Authorization": "Bearer {env:ZHIPU_MCP_API_KEY}"
+        "Authorization": "Bearer {env:ZHIPU_API_KEY}"
       },
       "enabled": false,
       "oauth": false
     },
     "tavily-mcp": {
       "type": "local",
-      "command": ["npx", "-y", "tavily-mcp@latest"],
+      "command": [
+        "npx",
+        "-y",
+        "tavily-mcp@latest"
+      ],
       "environment": {
-        "TAVILY_API_KEY": "{env:TAVILY_API_KEY}"
+        "TAVILY_API_KEY": "{env:TAVILY_API_KEY}",
+        "DEFAULT_PARAMETERS": "{\"include_images\": true, \"search_depth\": \"advanced\", \"max_results\": 20}"
       },
       "enabled": false
     },
     "firecrawl-mcp": {
       "type": "local",
-      "command": ["npx", "-y", "firecrawl-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "firecrawl-mcp"
+      ],
       "environment": {
         "FIRECRAWL_API_KEY": "{env:FIRECRAWL_API_KEY}"
       },

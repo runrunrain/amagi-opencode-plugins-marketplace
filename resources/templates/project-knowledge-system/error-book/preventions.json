@@ -1,0 +1,44 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "预防措施 - 避免问题再次发生的措施",
+  "preventions": [],
+  "categories": [
+    {
+      "id": "process",
+      "name": "流程改进",
+      "description": "通过改进流程预防问题"
+    },
+    {
+      "id": "code",
+      "name": "代码改进",
+      "description": "通过改进代码预防问题"
+    },
+    {
+      "id": "testing",
+      "name": "测试加强",
+      "description": "通过加强测试预防问题"
+    },
+    {
+      "id": "monitoring",
+      "name": "监控告警",
+      "description": "通过监控预防问题"
+    }
+  ],
+  "statistics": {
+    "totalPreventions": 0,
+    "byType": {
+      "detection": 0,
+      "prevention": 0,
+      "mitigation": 0
+    },
+    "byCategory": {
+      "process": 0,
+      "code": 0,
+      "testing": 0,
+      "monitoring": 0
+    },
+    "highEffectiveness": 0
+  }
+}

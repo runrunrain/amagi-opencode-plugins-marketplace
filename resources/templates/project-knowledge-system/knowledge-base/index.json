@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../core/schemas/knowledge-base-schema.json",
+  "projectId": "{project-id}",
+  "version": "1.0",
+  "lastUpdated": "2026-02-10",
+  "description": "项目知识库索引 - 存放开发规范、项目约定等核心知识",
+  "summaryFields": ["id", "title", "description", "summary", "priority", "autoLoad", "keyQuestions"],
+  "detailFields": ["path"],
+  "glossary": {
+    "path": "glossary.json",
+    "description": "核心术语中心。其他文件通过 $ref: glossary#termId 引用此文件，避免重复定义"
+  },
+  "entries": [
+    {
+      "id": "development-specs",
+      "title": "开发规范",
+      "description": "开发过程中的注意事项和最佳实践",
+      "path": "development-specs.json",
+      "priority": "high",
+      "autoLoad": true,
+      "summary": "{一句话说明该分类能回答什么问题}",
+      "keyQuestions": [
+        "{Agent 最常查询的问题 1}",
+        "{Agent 最常查询的问题 2}"
+      ]
+    },
+    {
+      "id": "conventions",
+      "title": "编码规范",
+      "description": "项目特定的代码风格、命名约定、架构决策",
+      "path": "conventions.json",
+      "priority": "high",
+      "autoLoad": true,
+      "summary": "{一句话说明该分类能回答什么问题}",
+      "keyQuestions": []
+    },
+    {
+      "id": "architecture",
+      "title": "架构设计",
+      "description": "系统架构、模块设计、技术选型",
+      "path": "architecture.json",
+      "priority": "high",
+      "autoLoad": true,
+      "summary": "{一句话说明该分类能回答什么问题}",
+      "keyQuestions": []
+    },
+    {
+      "id": "api-reference",
+      "title": "API 参考",
+      "description": "API 接口文档、数据模型定义",
+      "path": "api-reference.json",
+      "priority": "medium",
+      "autoLoad": false,
+      "summary": "{一句话说明该分类能回答什么问题}",
+      "keyQuestions": []
+    }
+  ],
+  "moduleRelations": {
+    "description": "知识库模块间引用关系图，帮助 Agent 理解知识间的依赖",
+    "relations": [
+      {"from": "glossary.json", "to": "*", "type": "{术语中心被所有模块引用}"},
+      {"from": "{source}.json", "to": "{target}.json", "type": "{引用关系说明}"}
+    ]
+  },
+  "metadata": {
+    "totalItems": 0,
+    "lastMigration": "{YYYY-MM-DD}",
+    "migrationSource": "markdown"
+  }
+}

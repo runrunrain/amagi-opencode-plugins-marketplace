@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:amagi-opencode:config:1.1",
+  "$id": "urn:amagi-opencode:config:1.5.161",
   "title": "Amagi OpenCode Configuration",
   "type": "object",
   "additionalProperties": false,

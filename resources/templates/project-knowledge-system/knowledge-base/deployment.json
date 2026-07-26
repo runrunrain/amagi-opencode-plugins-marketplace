@@ -1,0 +1,44 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "部署指南 - 环境配置、部署流程、运维文档",
+  "environments": [
+    {
+      "name": "development",
+      "description": "开发环境",
+      "baseUrl": "http://localhost:3000",
+      "apiUrl": "http://localhost:8000"
+    },
+    {
+      "name": "staging",
+      "description": "测试环境",
+      "baseUrl": "https://staging.example.com",
+      "apiUrl": "https://api-staging.example.com"
+    },
+    {
+      "name": "production",
+      "description": "生产环境",
+      "baseUrl": "https://example.com",
+      "apiUrl": "https://api.example.com"
+    }
+  ],
+  "environmentVariables": [],
+  "deployment": {
+    "strategy": "rolling | blue-green | canary",
+    "description": "部署策略说明",
+    "steps": []
+  },
+  "infrastructure": {
+    "provider": "aws | gcp | azure | on-premise",
+    "services": []
+  },
+  "monitoring": {
+    "tools": [],
+    "alerts": []
+  },
+  "rollback": {
+    "strategy": "回滚策略",
+    "steps": []
+  }
+}

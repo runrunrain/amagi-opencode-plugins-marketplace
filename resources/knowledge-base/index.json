@@ -1,0 +1,93 @@
+{
+  "version": "10.3",
+  "lastUpdated": "2026-05-10",
+  "description": "Amagi通用知识库索引 - 存储可跨项目复用的最佳实践、常见错误和工具指南",
+  "scope": "universal",
+  "defaultLoadPolicy": {
+    "description": "仅索引默认可见；具体知识条目按任务命中、priority、autoLoad 与生命周期状态渐进读取",
+    "lifecycleStatuses": ["active", "candidate", "dormant", "deprecated"],
+    "loadByDefault": ["active with autoLoad=true"],
+    "indexOnly": ["candidate", "dormant", "deprecated"]
+  },
+  "categories": {
+    "governance": {
+      "name": "Governance",
+      "nameCN": "治理框架",
+      "description": "Project governance, architecture management, and compliance frameworks",
+      "path": "./",
+      "entries": []
+    },
+    "best-practices": {
+      "name": "Best Practices",
+      "nameCN": "最佳实践",
+      "description": "Verified development patterns and practices (cross-project)",
+      "path": "best-practices/",
+      "entries": [
+        {
+          "id": "BP-001",
+          "title": "Functional Design Document Writing Guide",
+          "titleCN": "功能设计文档撰写指南",
+          "file": "best-practices/functional-design-document-writing-guide.md",
+          "description": "Comprehensive guide on writing clear, effective design documents. Covers audience analysis, content organization, readability, avoiding AI-flavor writing, and quality checks.",
+          "tags": ["documentation", "writing", "design-doc", "best-practices", "methodology"],
+          "created": "2026-01-15",
+          "updated": "2026-01-22",
+          "applicableAgents": ["architect", "writer", "coder", "designer", "reviewer"],
+          "searchKeywords": [
+            "文档撰写",
+            "设计文档",
+            "写作指南",
+            "金字塔结构",
+            "读者思维",
+            "AI味",
+            "文档质量",
+            "写作方法论",
+            "design document",
+            "writing guide",
+            "documentation"
+          ]
+        }
+      ]
+    },
+    "common-errors": {
+      "name": "Common Errors",
+      "nameCN": "常见错误",
+      "description": "Error patterns and their solutions (cross-project)",
+      "path": "common-errors/",
+      "entries": []
+    },
+    "tools": {
+      "name": "Tool Guides",
+      "nameCN": "工具指南",
+      "description": "Tool usage tips and best practices (cross-project)",
+      "path": "tools/",
+      "entries": []
+    }
+  },
+  "writePermission": "thinker-only",
+  "entryFormat": {
+    "id": "Unique identifier",
+    "title": "Entry title",
+    "tags": ["tag array"],
+    "created": "Creation date",
+    "updated": "Update date",
+    "file": "Relative file path"
+  },
+  "isolationPolicy": {
+    "description": "知识隔离策略",
+    "universalKnowledge": "可跨项目复用的通用知识存放于此目录",
+    "projectSpecificKnowledge": "项目特定知识存放于 projects/{project-id}/knowledge-base/",
+    "classificationCriteria": [
+      "技术栈无关的方法论 → 通用",
+      "特定技术栈（Godot、Unity等）→ 项目特定",
+      "思维模式、协作规范 → 通用",
+      "项目API、审核清单 → 项目特定"
+    ]
+  },
+  "notes": [
+    "Knowledge base entries are created and updated by Thinker during reflection",
+    "Entries should include specific context, problem description, and solution",
+    "Periodically clean up outdated entries to keep the knowledge base concise",
+    "Project-specific knowledge should be placed in projects/{id}/knowledge-base/"
+  ]
+}

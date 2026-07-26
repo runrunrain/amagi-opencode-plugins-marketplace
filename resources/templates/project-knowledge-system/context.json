@@ -1,0 +1,98 @@
+{
+  "$schema": "../../core/schemas/context-schema.json",
+  "projectId": "{project-id}",
+  "projectName": "项目名称",
+  "version": "1.0",
+  "lastUpdated": "2026-02-10",
+  "description": "项目上下文汇总 - 主 Agent 加载入口",
+  "projectInfo": {
+    "id": "{project-id}",
+    "name": "项目名称",
+    "type": "web-app | mobile-app | api | library | tool",
+    "status": "active | paused | archived",
+    "techStack": ["技术1", "技术2"],
+    "description": "项目描述"
+  },
+  "autoLoadSections": [
+    {
+      "section": "knowledge-base",
+      "priority": "high",
+      "loadStrategy": "full",
+      "filter": {
+        "priority": ["high"],
+        "autoLoad": true
+      }
+    },
+    {
+      "section": "tactical-book",
+      "priority": "medium",
+      "loadStrategy": "progressive",
+      "filter": {
+        "percentile": 70,
+        "categories": ["techniques", "checklists"]
+      }
+    },
+    {
+      "section": "error-book",
+      "priority": "low",
+      "loadStrategy": "on-demand",
+      "filter": {
+        "status": ["open", "investigating"],
+        "severity": ["critical", "high"]
+      }
+    },
+    {
+      "section": "domains",
+      "priority": "high",
+      "loadStrategy": "registry-only",
+      "description": "仅加载领域注册表（domains/index.json），具体领域按任务匹配按需加载",
+      "filter": {
+        "registryOnly": true
+      }
+    }
+  ],
+  "paths": {
+    "knowledgeBase": "knowledge-base/index.json",
+    "tacticalBook": "tactical-book/index.json",
+    "errorBook": "error-book/index.json",
+    "config": "memory-map.json",
+    "memoryMap": "memory-map.json",
+    "taskIndex": "task-index.json",
+    "tasksDir": "tasks/",
+    "projectContext": "project-context.md",
+    "glossary": "knowledge-base/glossary.json",
+    "domainRegistry": "knowledge-base/domains/index.json",
+    "taskArchive": "task-archive.json"
+  },
+  "environment": {
+    "importantTools": [
+      {
+        "name": "工具名称",
+        "description": "工具用途",
+        "important": true,
+        "documentation": "文档路径"
+      }
+    ]
+  },
+  "quickReference": {
+    "commonCommands": [
+      {
+        "command": "命令",
+        "description": "说明"
+      }
+    ],
+    "commonIssues": [
+      {
+        "issue": "问题描述",
+        "solutionId": "sol-{id}"
+      }
+    ]
+  },
+  "metadata": {
+    "totalKnowledgeItems": 0,
+    "totalTacticalItems": 0,
+    "totalErrorItems": 0,
+    "lastMigration": "{YYYY-MM-DD}",
+    "migrationSource": "markdown"
+  }
+}

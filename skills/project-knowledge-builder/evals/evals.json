@@ -1,0 +1,52 @@
+{
+  "skill_name": "project-knowledge-builder",
+  "schema_version": "2.0",
+  "target": { "type": "skill", "name": "project-knowledge-builder" },
+  "evals": [
+    {
+      "id": "build-project-memory",
+      "prompt": "为 /repo/my-service 构建项目知识库，输出到 projects-memory/projects/my-service，标准深度。",
+      "expected_output": "Builds persistent projects-memory dataset with context, memory-map, knowledge-base files and validation.",
+      "files": [],
+      "target": { "type": "skill", "name": "project-knowledge-builder" },
+      "behavior_tags": ["skill.project_knowledge_builder", "verification.self_test"],
+      "split": "smoke",
+      "scorer": {
+        "type": "structural",
+        "pass_criteria": ["触发 project-knowledge-builder", "生成 context.json", "生成 memory-map.json", "生成 knowledge-base 目录"]
+      },
+      "harness_path": "evidence_path",
+      "risk_level": "medium"
+    },
+    {
+      "id": "domain-deep-dive",
+      "prompt": "刷新项目记忆，并深化 auth 模块知识，要求有领域索引和关系链。",
+      "expected_output": "Runs domain scope/deepening flow and updates domain knowledge plus navigation assets.",
+      "files": [],
+      "target": { "type": "skill", "name": "project-knowledge-builder" },
+      "behavior_tags": ["skill.project_knowledge_builder", "verification.self_test"],
+      "split": "targeted",
+      "scorer": {
+        "type": "keyword",
+        "pass_criteria": ["深化领域知识", "更新领域索引", "关系链生成"]
+      },
+      "harness_path": "evidence_path",
+      "risk_level": "medium"
+    },
+    {
+      "id": "negative-one-time-explore",
+      "prompt": "帮我快速看看 src/auth/login.ts 这个文件是做什么的。",
+      "expected_output": "Should use one-time exploration rather than project-knowledge-builder.",
+      "files": [],
+      "target": { "type": "skill", "name": "project-knowledge-builder" },
+      "behavior_tags": ["boundary.negative", "skill.project_knowledge_builder"],
+      "split": "smoke",
+      "scorer": {
+        "type": "keyword",
+        "must_not_include": ["project-knowledge-builder", "构建知识库", "知识库"]
+      },
+      "harness_path": "default_fast_path",
+      "risk_level": "low"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "projectId": "{project-id}",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "sections": {
+    "1_basicInfo": {
+      "title": "项目身份",
+      "content": {
+        "identity": "{项目名称} - {一行身份描述}",
+        "purpose": "{项目做什么}",
+        "scope": "{覆盖范围}",
+        "audience": "{目标用户}",
+        "organization": "{团队或公司}"
+      }
+    },
+    "2_paths": {
+      "title": "关键路径",
+      "content": {
+        "projectRoot": "{绝对路径}",
+        "mainExecutable": "{相对路径或 N/A}",
+        "entryPoint": "{src/main.ts 或 Program.cs 等}",
+        "config": "{主配置文件路径}",
+        "buildOutput": "{bin/ 或 dist/ 等}"
+      }
+    },
+    "3_systemStatus": {
+      "title": "系统状态",
+      "content": {
+        "version": "{检测到的版本或 unknown}",
+        "platform": "{Windows|Linux|macOS|Cross-platform}",
+        "runtime": "{.NET 8.0 或 Node 20 等}",
+        "status": "{production-ready|development|prototype}",
+        "lastVerified": "{YYYY-MM-DD}",
+        "featureFlags": {}
+      }
+    },
+    "6_technicalPoints": {
+      "title": "技术要点",
+      "content": {
+        "architecture": "{简要架构描述}",
+        "dataFlow": "{输入 -> 处理 -> 输出}",
+        "keyTechnologies": ["{Tech1 - 用途}", "{Tech2 - 用途}"],
+        "designPatterns": ["{Pattern1}", "{Pattern2}"]
+      }
+    },
+    "7_insights": {
+      "title": "洞察与风险",
+      "content": {
+        "architecturalInsights": ["{洞察 1}", "{洞察 2}"],
+        "detectedPatterns": ["{模式 1}", "{模式 2}"],
+        "potentialRisks": ["{风险 1}"],
+        "recommendations": ["{建议 1}"]
+      }
+    },
+    "8_quickStart": {
+      "title": "快速启动",
+      "content": {
+        "buildCommand": "{dotnet build 或 npm run build 等}",
+        "runCommand": "{dotnet run 或 npm start 等}",
+        "testCommand": "{dotnet test 或 npm test 等}",
+        "prerequisites": ["{前置条件 1}", "{前置条件 2}"],
+        "setupSteps": ["{步骤 1}", "{步骤 2}"],
+        "debugTools": {}
+      }
+    },
+    "9_collaboration": {
+      "title": "协作规范",
+      "content": {
+        "namingConventions": "{PascalCase/camelCase/snake_case}",
+        "codeStyle": "{简要风格描述}",
+        "branchingStrategy": "{检测到的策略或 unknown}",
+        "testingApproach": "{检测到的测试框架和模式}"
+      }
+    }
+  }
+}

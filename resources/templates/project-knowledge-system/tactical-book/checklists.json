@@ -1,0 +1,34 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "检查清单和验收标准",
+  "checklists": [],
+  "categories": [
+    {
+      "id": "code-review",
+      "name": "代码审查",
+      "description": "代码审查检查项"
+    },
+    {
+      "id": "deployment",
+      "name": "部署检查",
+      "description": "部署前检查项"
+    },
+    {
+      "id": "testing",
+      "name": "测试检查",
+      "description": "测试覆盖检查项"
+    },
+    {
+      "id": "security",
+      "name": "安全检查",
+      "description": "安全审查检查项"
+    },
+    {
+      "id": "performance",
+      "name": "性能检查",
+      "description": "性能审查检查项"
+    }
+  ]
+}

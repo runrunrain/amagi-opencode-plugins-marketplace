@@ -1,0 +1,18 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "架构设计文档 - 系统架构、模块设计、技术选型",
+  "overview": {
+    "architectureType": "monolith | microservices | serverless | hybrid",
+    "description": "架构概述",
+    "keyPrinciples": [
+      "原则1",
+      "原则2"
+    ]
+  },
+  "modules": [],
+  "dataFlow": [],
+  "technologies": [],
+  "decisions": []
+}

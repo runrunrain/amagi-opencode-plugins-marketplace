@@ -1,0 +1,51 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "问题记录 - 遇到的问题和故障详细记录",
+  "problems": [],
+  "categories": [
+    {
+      "id": "bug",
+      "name": "程序错误",
+      "description": "代码缺陷导致的错误"
+    },
+    {
+      "id": "performance",
+      "name": "性能问题",
+      "description": "性能相关问题"
+    },
+    {
+      "id": "security",
+      "name": "安全问题",
+      "description": "安全相关的问题"
+    },
+    {
+      "id": "compatibility",
+      "name": "兼容性问题",
+      "description": "版本或平台兼容性问题"
+    }
+  ],
+  "statistics": {
+    "totalProblems": 0,
+    "byStatus": {
+      "open": 0,
+      "investigating": 0,
+      "resolved": 0,
+      "closed": 0
+    },
+    "bySeverity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "byCategory": {
+      "bug": 0,
+      "performance": 0,
+      "security": 0,
+      "compatibility": 0
+    },
+    "recurringProblems": 0
+  }
+}

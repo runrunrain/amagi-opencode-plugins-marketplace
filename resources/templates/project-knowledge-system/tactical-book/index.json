@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../core/schemas/tactical-book-schema.json",
+  "projectId": "{project-id}",
+  "version": "1.0",
+  "lastUpdated": "2026-02-10",
+  "description": "战术手册索引 - 精妙技巧、实用方法、实战经验",
+  "summaryFields": ["id", "name", "description", "priority", "itemCount"],
+  "detailFields": ["file"],
+  "categories": [
+    {
+      "id": "techniques",
+      "name": "技巧集",
+      "description": "实战中总结的精妙技巧和方法",
+      "file": "techniques.json",
+      "priority": "high",
+      "itemCount": 0
+    },
+    {
+      "id": "patterns",
+      "name": "设计模式",
+      "description": "常见设计模式的应用实践",
+      "file": "patterns.json",
+      "priority": "medium",
+      "itemCount": 0
+    },
+    {
+      "id": "snippets",
+      "name": "代码片段",
+      "description": "常用代码片段和模板",
+      "file": "snippets.json",
+      "priority": "medium",
+      "itemCount": 0
+    },
+    {
+      "id": "checklists",
+      "name": "检查清单",
+      "description": "各类检查清单和验收标准",
+      "file": "checklists.json",
+      "priority": "high",
+      "itemCount": 0
+    }
+  ],
+  "usageStats": {
+    "file": "usage-stats.json",
+    "autoLoadThreshold": 70,
+    "progressiveDisclosure": true
+  },
+  "metadata": {
+    "totalTechniques": 0,
+    "highFrequency": 0,
+    "mediumFrequency": 0,
+    "lowFrequency": 0
+  }
+}

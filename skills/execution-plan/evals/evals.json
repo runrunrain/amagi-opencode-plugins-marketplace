@@ -1,0 +1,53 @@
+{
+  "skill_name": "execution-plan",
+  "schema_version": "2.0",
+  "target": { "type": "skill", "name": "execution-plan" },
+  "evals": [
+    {
+      "id": "multi-phase-execution-plan",
+      "prompt": "基于需求分析文档 agent-outputs/requirement-analysis/20260602-user-system/requirement-analysis.md，制定执行计划，拆分为多阶段实施。",
+      "expected_output": "Triggers execution-plan skill, outputs multi-phase plan with task breakdown, agent assignments, dependencies, verification criteria. Each task <=30min. References requirement-analysis sub-requirements.",
+      "files": [],
+      "target": { "type": "skill", "name": "execution-plan" },
+      "behavior_tags": ["skill.execution_plan", "planning.execution_plan", "artifact.required_read"],
+      "split": "smoke",
+      "scorer": {
+        "type": "structural",
+        "pass_criteria": ["包含 Phase 划分", "每个任务指定 Agent", "有依赖关系", "有验收标准", "引用上游需求编号"]
+      },
+      "harness_path": "evidence_path",
+      "risk_level": "high"
+    },
+    {
+      "id": "negative-no-requirement-artifact",
+      "prompt": "直接帮我制定一个用户系统的执行计划。",
+      "expected_output": "Should trigger requirement-analysis first, NOT execution-plan directly. Execution-plan requires upstream requirement-analysis artifact.",
+      "files": [],
+      "target": { "type": "skill", "name": "execution-plan" },
+      "behavior_tags": ["boundary.negative", "planning.requirement_first"],
+      "split": "smoke",
+      "scorer": {
+        "type": "keyword",
+        "must_not_include": ["Phase 1", "执行计划文档"],
+        "pass_criteria": ["先触发 requirement-analysis", "提示缺少需求分析 artifact"]
+      },
+      "harness_path": "evidence_path",
+      "risk_level": "medium"
+    },
+    {
+      "id": "boundary-single-step-task",
+      "prompt": "只需要帮我修一个拼写错误，不需要拆计划。",
+      "expected_output": "Should NOT trigger execution-plan; single-step task handled directly. No phase breakdown needed.",
+      "files": [],
+      "target": { "type": "skill", "name": "execution-plan" },
+      "behavior_tags": ["boundary.negative", "skill.execution_plan"],
+      "split": "targeted",
+      "scorer": {
+        "type": "keyword",
+        "must_not_include": ["execution-plan", "Phase", "执行计划文档"]
+      },
+      "harness_path": "default_fast_path",
+      "risk_level": "low"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "name": "amagi-opencode-plugins-marketplace",
-  "version": "1.3.2",
-  "description": "Amagi multi-model orchestration plugin for OpenCode",
+  "version": "1.5.161",
+  "description": "Amagi 1.5.161 multi-agent collaboration framework for OpenCode",
   "type": "module",
   "main": "./index.js",
   "exports": {
@@ -9,23 +9,32 @@
     "./server": "./index.js"
   },
   "scripts": {
+    "sync:upstream": "node scripts/sync-upstream.mjs",
     "test": "node --test tests/*.test.mjs",
-    "validate": "node --check index.js && node --test tests/*.test.mjs"
+    "validate": "node --check index.js && node --check lib/assets.js && node --check lib/guards.js && node --check scripts/sync-upstream.mjs && node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.18.5"
   },
   "files": [
     "index.js",
-    "instructions/",
+    "lib/",
+    "commands/",
     "manifest/",
     "mcp/",
     "profiles/",
     "prompts/",
+    "resources/",
+    "rules/",
     "schemas/",
+    "scripts/",
+    "skills/",
     "README.md",
     "LICENSE"
   ],
   "engines": {
     "node": ">=20",
-    "opencode": ">=1.17.0"
+    "opencode": ">=1.18.5"
   },
   "keywords": [
     "opencode",

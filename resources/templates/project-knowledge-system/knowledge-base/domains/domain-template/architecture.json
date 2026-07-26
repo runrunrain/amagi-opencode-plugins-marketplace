@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "domainId": "{domain-id}",
+  "description": "{领域名称}架构设计",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "architecture": {
+    "overview": "{领域架构概述}",
+    "components": [
+      {
+        "name": "{组件名}",
+        "responsibility": "{职责}",
+        "interfaces": ["{接口1}"],
+        "dependsOn": ["{依赖组件}"]
+      }
+    ],
+    "dataFlow": {
+      "description": "{领域内数据流}",
+      "stages": [
+        { "stage": "{阶段名}", "description": "{说明}" }
+      ]
+    },
+    "externalDependencies": [
+      { "name": "{外部依赖名}", "type": "database", "purpose": "{用途}" }
+    ],
+    "designDecisions": [
+      { "decision": "{设计决策}", "rationale": "{原因}", "alternatives": ["{备选方案}"] }
+    ]
+  }
+}

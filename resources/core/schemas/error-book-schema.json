@@ -1,0 +1,386 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/error-book-schema.json",
+  "title": "Error Book Schema",
+  "description": "错误手册索引 - 问题记录、解决方案、经验教训的JSON Schema定义",
+  "type": "object",
+  "required": [
+    "projectId",
+    "version",
+    "lastUpdated",
+    "categories",
+    "statistics",
+    "metadata"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema引用"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "项目唯一标识符",
+      "pattern": "^[a-z0-9-]+$",
+      "example": "my-awesome-project"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件版本号 (语义化版本)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601格式)",
+      "format": "date",
+      "example": "2025-01-15"
+    },
+    "description": {
+      "type": "string",
+      "description": "错误手册描述",
+      "example": "错误手册索引 - 问题记录、解决方案、经验教训"
+    },
+    "categories": {
+      "type": "array",
+      "description": "错误分类列表",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "file"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "分类ID",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "problems"
+          },
+          "name": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "问题记录"
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "遇到的问题和故障"
+          },
+          "file": {
+            "type": "string",
+            "description": "分类对应的文件",
+            "example": "problems.json"
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "条目数量",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "statistics": {
+      "type": "object",
+      "description": "错误统计信息",
+      "properties": {
+        "totalProblems": {
+          "type": "integer",
+          "description": "问题总数",
+          "minimum": 0
+        },
+        "resolvedProblems": {
+          "type": "integer",
+          "description": "已解决问题数量",
+          "minimum": 0
+        },
+        "recurringProblems": {
+          "type": "integer",
+          "description": "重复出现的问题数量",
+          "minimum": 0
+        },
+        "highSeverityProblems": {
+          "type": "integer",
+          "description": "高严重性问题数量",
+          "minimum": 0
+        },
+        "averageResolutionTime": {
+          "type": "number",
+          "description": "平均解决时间（小时）",
+          "minimum": 0
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元数据信息",
+      "properties": {
+        "trackingEnabled": {
+          "type": "boolean",
+          "description": "是否启用错误跟踪",
+          "default": true
+        },
+        "trackingStartDate": {
+          "type": "string",
+          "description": "跟踪开始日期",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "problemItem": {
+      "type": "object",
+      "description": "问题条目定义",
+      "required": [
+        "id",
+        "title",
+        "description",
+        "status",
+        "severity",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "问题ID",
+          "pattern": "^prob-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "问题标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "问题描述"
+        },
+        "status": {
+          "type": "string",
+          "description": "问题状态",
+          "enum": [
+            "open",
+            "investigating",
+            "resolved",
+            "closed"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "description": "严重程度",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "category": {
+          "type": "string",
+          "description": "问题分类"
+        },
+        "reproduction": {
+          "type": "string",
+          "description": "复现步骤"
+        },
+        "environment": {
+          "type": "string",
+          "description": "环境信息"
+        },
+        "errorLog": {
+          "type": "string",
+          "description": "错误日志"
+        },
+        "stackTrace": {
+          "type": "string",
+          "description": "堆栈跟踪"
+        },
+        "relatedIssues": {
+          "type": "array",
+          "description": "相关问题ID列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "solutionIds": {
+          "type": "array",
+          "description": "解决方案ID列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "创建日期",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "更新日期",
+          "format": "date-time"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "description": "解决日期",
+          "format": "date-time"
+        }
+      }
+    },
+    "solutionItem": {
+      "type": "object",
+      "description": "解决方案条目定义",
+      "required": [
+        "id",
+        "title",
+        "description",
+        "problemIds",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "解决方案ID",
+          "pattern": "^sol-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "解决方案标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "解决方案描述"
+        },
+        "problemIds": {
+          "type": "array",
+          "description": "解决的问题ID列表",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "steps": {
+          "type": "array",
+          "description": "解决步骤",
+          "items": {
+            "type": "string"
+          }
+        },
+        "code": {
+          "type": "string",
+          "description": "代码示例"
+        },
+        "workaround": {
+          "type": "string",
+          "description": "临时解决方案"
+        },
+        "rootCause": {
+          "type": "string",
+          "description": "根本原因分析"
+        },
+        "preventionIds": {
+          "type": "array",
+          "description": "预防措施ID列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "tags": {
+          "type": "array",
+          "description": "标签列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "创建日期",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "更新日期",
+          "format": "date-time"
+        }
+      }
+    },
+    "preventionItem": {
+      "type": "object",
+      "description": "预防措施条目定义",
+      "required": [
+        "id",
+        "title",
+        "description",
+        "problemIds",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "预防措施ID",
+          "pattern": "^prev-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "预防措施标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "预防措施描述"
+        },
+        "problemIds": {
+          "type": "array",
+          "description": "预防的问题ID列表",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "type": {
+          "type": "string",
+          "description": "预防类型",
+          "enum": [
+            "code",
+            "process",
+            "documentation",
+            "testing",
+            "monitoring"
+          ]
+        },
+        "implementation": {
+          "type": "string",
+          "description": "实施说明"
+        },
+        "verification": {
+          "type": "string",
+          "description": "验证方法"
+        },
+        "tags": {
+          "type": "array",
+          "description": "标签列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "创建日期",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "更新日期",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

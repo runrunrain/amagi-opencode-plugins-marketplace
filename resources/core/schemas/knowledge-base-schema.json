@@ -1,0 +1,165 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/knowledge-base-schema.json",
+  "title": "Knowledge Base Schema",
+  "description": "项目知识库索引 - 存放开发规范、项目约定等核心知识的JSON Schema定义",
+  "type": "object",
+  "required": [
+    "projectId",
+    "version",
+    "lastUpdated",
+    "categories",
+    "metadata"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema引用"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "项目唯一标识符",
+      "pattern": "^[a-z0-9-]+$",
+      "example": "my-awesome-project"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件版本号 (语义化版本)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601格式)",
+      "format": "date",
+      "example": "2025-01-15"
+    },
+    "description": {
+      "type": "string",
+      "description": "知识库描述",
+      "example": "项目知识库索引 - 存放开发规范、项目约定等核心知识"
+    },
+    "categories": {
+      "type": "array",
+      "description": "知识分类列表",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "file",
+          "priority"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "分类ID",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "dev-specs"
+          },
+          "name": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "开发规范"
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "开发过程中的注意事项和最佳实践"
+          },
+          "file": {
+            "type": "string",
+            "description": "分类对应的文件",
+            "example": "development-specs.json"
+          },
+          "priority": {
+            "type": "string",
+            "description": "优先级",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "autoLoad": {
+            "type": "boolean",
+            "description": "是否自动加载",
+            "default": false
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "条目数量",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元数据信息",
+      "properties": {
+        "totalItems": {
+          "type": "integer",
+          "description": "总条目数",
+          "minimum": 0
+        },
+        "lastMigration": {
+          "type": "string",
+          "description": "最后迁移日期",
+          "format": "date"
+        },
+        "migrationSource": {
+          "type": "string",
+          "description": "迁移源",
+          "example": "markdown"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "knowledgeItem": {
+      "type": "object",
+      "description": "知识条目定义",
+      "required": [
+        "id",
+        "title",
+        "content"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "条目ID"
+        },
+        "title": {
+          "type": "string",
+          "description": "标题"
+        },
+        "content": {
+          "type": "string",
+          "description": "内容"
+        },
+        "category": {
+          "type": "string",
+          "description": "所属分类"
+        },
+        "tags": {
+          "type": "array",
+          "description": "标签列表",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  }
+}

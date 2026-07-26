@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "lastUpdated": "{YYYY-MM-DD}",
+  "summaryFields": ["id", "title", "status", "type", "priority", "summary"],
+  "detailFields": ["filePath"],
+  "summary": {
+    "totalActiveTasks": 0,
+    "inProgress": 0,
+    "blocked": 0,
+    "planned": 0,
+    "archiveStats": {
+      "_description": "归档任务快速统计（单一数据源），迁移任务时仅更新此处",
+      "totalCompleted": 0,
+      "totalCancelled": 0,
+      "dateRange": {
+        "earliest": null,
+        "latest": null
+      }
+    }
+  },
+  "currentPhase": {
+    "name": "{当前开发阶段}",
+    "description": "{简要描述}",
+    "startDate": "{YYYY-MM-DD}"
+  },
+  "tasks": [
+    {
+      "id": "task-{YYYYMMDD}-001",
+      "title": "{任务标题}",
+      "date": "{YYYY-MM-DD}",
+      "status": "in-progress",
+      "type": "feature",
+      "priority": "P1",
+      "filePath": "tasks/task-{YYYYMMDD}-001.json",
+      "summary": "{不超过100字的一句话摘要}"
+    }
+  ],
+  "recentChangelog": [
+    {
+      "date": "{YYYY-MM-DD}",
+      "summary": "{本次变更的一句话描述}",
+      "type": "feat"
+    }
+  ]
+}

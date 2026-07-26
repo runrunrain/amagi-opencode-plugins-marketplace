@@ -1,0 +1,9 @@
+{
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "API 接口文档 - REST API、GraphQL、内部接口",
+  "baseUrl": "https://api.example.com",
+  "endpoints": [],
+  "dataModels": []
+}

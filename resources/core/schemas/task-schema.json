@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/task-schema.json",
+  "title": "Task Schema",
+  "description": "单个任务详情文件 tasks/task-{YYYYMMDD}-{seq}.json 的 JSON Schema 定义。存储任务完整记录，按需加载。",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "priority",
+    "date",
+    "description",
+    "tags",
+    "changes"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema 引用"
+    },
+    "id": {
+      "type": "string",
+      "description": "任务唯一 ID，格式：task-{YYYYMMDD}-{seq}",
+      "pattern": "^task-\\d{8}-\\d{3,}$",
+      "example": "task-20260317-001"
+    },
+    "title": {
+      "type": "string",
+      "description": "任务标题",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "type": {
+      "type": "string",
+      "description": "任务类型",
+      "enum": [
+        "feature",
+        "bugfix",
+        "optimization",
+        "test",
+        "docs"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "任务状态",
+      "enum": [
+        "completed",
+        "in-progress",
+        "blocked",
+        "cancelled"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "description": "任务优先级",
+      "enum": [
+        "P0",
+        "P1",
+        "P2"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "description": "任务开始/记录日期 (ISO 8601 格式)",
+      "format": "date",
+      "example": "2026-03-17"
+    },
+    "completedDate": {
+      "type": "string",
+      "description": "任务完成日期 (ISO 8601 格式)，仅 status=completed 时填写",
+      "format": "date",
+      "example": "2026-03-17"
+    },
+    "description": {
+      "type": "string",
+      "description": "任务详细描述",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "description": "任务标签列表",
+      "items": {
+        "type": "string"
+      }
+    },
+    "changes": {
+      "type": "array",
+      "description": "本次任务涉及的文件变更列表",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "change"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "变更文件路径（相对于项目代码根目录）",
+            "example": "backend/app/api/routes.py"
+          },
+          "change": {
+            "type": "string",
+            "description": "具体变更说明"
+          },
+          "type": {
+            "type": "string",
+            "description": "变更操作类型",
+            "enum": [
+              "add",
+              "modify",
+              "delete"
+            ]
+          }
+        }
+      }
+    },
+    "testResults": {
+      "type": "object",
+      "description": "测试结果统计（可选）",
+      "properties": {
+        "totalTests": {
+          "type": "integer",
+          "description": "总测试数",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "description": "通过数",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "description": "失败数",
+          "minimum": 0
+        }
+      }
+    },
+    "insights": {
+      "type": "array",
+      "description": "本次任务产生的技术洞察或经验",
+      "items": {
+        "type": "string"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "description": "任务中发现或遗留的问题",
+      "items": {
+        "type": "object",
+        "required": [
+          "issueId",
+          "description",
+          "priority",
+          "status"
+        ],
+        "properties": {
+          "issueId": {
+            "type": "string",
+            "description": "问题 ID，如 P1-001",
+            "example": "P1-001"
+          },
+          "description": {
+            "type": "string",
+            "description": "问题描述"
+          },
+          "priority": {
+            "type": "string",
+            "description": "问题优先级",
+            "enum": [
+              "P0",
+              "P1",
+              "P2"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "问题状态",
+            "example": "待修复"
+          }
+        }
+      }
+    },
+    "commits": {
+      "type": "array",
+      "description": "关联的 Git commit hash 列表",
+      "items": {
+        "type": "string",
+        "description": "Git commit hash（完整或前7位）"
+      }
+    },
+    "relatedMilestone": {
+      "type": "string",
+      "description": "关联的里程碑 ID（可选）",
+      "example": "milestone-001"
+    },
+    "verification": {
+      "type": "string",
+      "description": "验证结果描述（可选），如 PASS / 构建通过 / 测试通过",
+      "example": "PASS"
+    },
+    "references": {
+      "type": "array",
+      "description": "相关文档路径或链接（可选）",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

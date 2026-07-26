@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../core/schemas/development-specs-schema.json",
+  "projectId": "{project-id}",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+  "description": "开发规范和注意事项 - 从项目实践中总结的经验",
+  "specifications": [],
+  "categories": [
+    {
+      "id": "code-quality",
+      "name": "代码质量",
+      "description": "代码风格、命名规范、注释要求"
+    },
+    {
+      "id": "security",
+      "name": "安全性",
+      "description": "安全最佳实践、常见安全问题"
+    },
+    {
+      "id": "performance",
+      "name": "性能",
+      "description": "性能优化建议、资源管理"
+    },
+    {
+      "id": "testing",
+      "name": "测试",
+      "description": "测试策略、测试覆盖率要求"
+    },
+    {
+      "id": "debugging",
+      "name": "调试",
+      "description": "调试技巧、常见问题排查"
+    }
+  ],
+  "metadata": {
+    "totalSpecs": 0,
+    "highPriorityCount": 0,
+    "lastReview": "{YYYY-MM-DD}"
+  }
+}

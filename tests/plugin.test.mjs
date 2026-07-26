@@ -3,6 +3,7 @@ import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
 import test from "node:test"
+import { execFileSync } from "node:child_process"
 
 import { AmagiOpenCodePlugin, resolveAmagiConfigPath } from "../index.js"
 
@@ -13,7 +14,8 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
     const config = {
       agent: {
         custom: { mode: "primary", model: "provider/custom" },
-        luban: { model: "provider/worker-override" },
+        luban: { model: "provider/worker-override", permission: "ask" },
+        baize: { permission: { task: "allow" } },
       },
     }
 
@@ -25,15 +27,98 @@ test("registers one leader and twelve tiered subagents at runtime", async () => 
     assert.equal(config.agent["amagi-leader"].mode, "primary")
     assert.equal(config.agent["amagi-leader"].model, "openai/gpt-5.6-terra")
     assert.equal(config.agent.luban.model, "provider/worker-override")
+    assert.equal(config.agent.luban.permission["*"], "ask")
+    assert.equal(config.agent.luban.permission.task, "deny")
     assert.equal(config.agent.baize.model, "zhipuai/glm-5-turbo")
-    assert.equal(config.agent.diting.permission.edit, "deny")
-    assert.match(config.agent["amagi-leader"].prompt, /强编排与模型分层/)
-    assert.match(config.agent.luban.prompt, /Task Contract/)
+    assert.equal(config.agent.baize.permission.task, "deny")
+    assert.equal(config.agent.diting.permission.edit["*"], "deny")
+    assert.equal(config.agent.diting.permission.task, "deny")
+    assert.equal(config.agent.taibai.model, "zhipuai/glm-5-turbo")
+    assert.match(config.agent["amagi-leader"].prompt, /攻坚型 harness/)
+    assert.match(config.agent.luban.prompt, /Amagi 1\.5\.161/)
     assert.equal(config.agent.custom.model, "provider/custom")
     assert.equal(config.mcp.memory.type, "local")
     assert.deepEqual(config.mcp.memory.command, ["npx", "-y", "@modelcontextprotocol/server-memory"])
     assert.equal(config.mcp.memory.enabled, false)
     assert.equal(config.mcp["web-search-prime"].type, "remote")
+    assert.equal(Object.keys(config.command).length, 11)
+    assert.match(config.command["pull-all-repos"].template, /\$ARGUMENTS/)
+    assert.ok(config.skills.paths.some((item) => item.endsWith("/skills")))
+    assert.ok(hooks.tool.amagi_resource)
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test("exposes converted canonical resources, commands, and skills", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-assets-"))
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, { config: path.join(directory, "amagi-opencode.json") })
+    const workflow = await hooks.tool.amagi_resource.execute({ resource: "workflow" }, {})
+    const skill = await hooks.tool.amagi_resource.execute(
+      { resource: "skills/workflow/SKILL.md" },
+      {},
+    )
+    assert.match(workflow, /验证层级（L1\/L2\/L3）/)
+    assert.match(skill, /OpenCode 适配/)
+    await assert.rejects(
+      () => hooks.tool.amagi_resource.execute({ resource: "../package.json" }, {}),
+      /Unknown Amagi resource/,
+    )
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test("ports blocking, commit, and JSON guards to native OpenCode hooks", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-guards-"))
+  try {
+    execFileSync("git", ["init", "-q"], { cwd: directory })
+    const hooks = await AmagiOpenCodePlugin(
+      { directory },
+      { config: path.join(directory, "config", "amagi-opencode.json") },
+    )
+
+    await assert.rejects(
+      () => hooks["tool.execute.before"](
+        { tool: "bash", sessionID: "s", callID: "c" },
+        { args: { command: "while true; do echo loop; done" } },
+      ),
+      /AMAGI BLOCKING GUARD/,
+    )
+
+    fs.writeFileSync(path.join(directory, ".env"), "SECRET=test\n")
+    execFileSync("git", ["add", ".env"], { cwd: directory })
+    await assert.rejects(
+      () => hooks["tool.execute.before"](
+        { tool: "bash", sessionID: "s", callID: "c" },
+        { args: { command: "git commit -m test" } },
+      ),
+      /AMAGI COMMIT GUARD/,
+    )
+
+    const invalid = path.join(directory, "broken.json")
+    fs.writeFileSync(invalid, "{")
+    await assert.rejects(
+      () => hooks["tool.execute.after"](
+        { tool: "write", sessionID: "s", callID: "c", args: { filePath: invalid } },
+        { title: "", output: "", metadata: {} },
+      ),
+      /AMAGI JSON GUARD/,
+    )
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test("preserves Amagi continuation state across compaction", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "amagi-opencode-compact-"))
+  try {
+    const hooks = await AmagiOpenCodePlugin({}, { config: path.join(directory, "amagi-opencode.json") })
+    const output = { context: [] }
+    await hooks["experimental.session.compacting"]({ sessionID: "session" }, output)
+    assert.match(output.context.join("\n"), /required artifact absolute paths/)
+    assert.match(output.context.join("\n"), /validation evidence/)
   } finally {
     fs.rmSync(directory, { recursive: true, force: true })
   }

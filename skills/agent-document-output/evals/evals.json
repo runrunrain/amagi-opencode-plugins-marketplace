@@ -1,0 +1,43 @@
+{
+  "skill_name": "agent-document-output",
+  "schema_version": "2.0",
+  "target": { "type": "skill", "name": "agent-document-output" },
+  "evals": [
+    {
+      "id": "implementation-artifact",
+      "prompt": "把这次实现结果保存成 implementation report，并写 metadata.json。",
+      "expected_output": "Creates main artifact and metadata.json under agent-outputs with upstream references and validation evidence.",
+      "files": [],
+      "target": { "type": "skill", "name": "agent-document-output" },
+      "behavior_tags": ["output.artifact_contract", "artifact.metadata"],
+      "split": "smoke",
+      "scorer": { "type": "structural", "pass_criteria": ["主文档路径存在", "metadata.json 字段完整", "validation_results 非空"] },
+      "harness_path": "evidence_path",
+      "risk_level": "medium"
+    },
+    {
+      "id": "failure-handoff",
+      "prompt": "任务失败了，请保存失败记录和交接说明。",
+      "expected_output": "Persists failure/handoff artifact with reason, evidence, risks, and next-step for Leader.",
+      "files": [],
+      "target": { "type": "skill", "name": "agent-document-output" },
+      "behavior_tags": ["output.artifact_contract", "artifact.upstream_reference"],
+      "split": "targeted",
+      "scorer": { "type": "keyword", "pass_criteria": ["包含失败原因", "包含风险说明", "包含建议下一步"] },
+      "harness_path": "evidence_path",
+      "risk_level": "medium"
+    },
+    {
+      "id": "negative-chat",
+      "prompt": "简单回复我今天日期即可，不需要生成文档。",
+      "expected_output": "Does not trigger artifact workflow for a transient chat answer.",
+      "files": [],
+      "target": { "type": "skill", "name": "agent-document-output" },
+      "behavior_tags": ["boundary.negative", "skill.agent_document_output"],
+      "split": "smoke",
+      "scorer": { "type": "keyword", "must_not_include": ["agent-outputs", "metadata.json", "artifact"] },
+      "harness_path": "default_fast_path",
+      "risk_level": "low"
+    }
+  ]
+}

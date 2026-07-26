@@ -1,10 +1,20 @@
-# Amagi OpenCode Plugins Marketplace
+# Amagi OpenCode Plugin
 
-面向 OpenCode 多服务商、多模型环境的原生强编排插件。高能力模型担任 `amagi-leader`，普通模型负责实现，轻量模型负责探索检索，专家模型负责架构、审核与高难度兜底。
+Amagi Claude Code 插件的 OpenCode 原生转换版。当前完整同步上游 **Amagi 1.5.161**（commit `4403f33b0705cd9758de844d5e07ee6f49c110ae`）。
 
-仓库本身是一个可被 OpenCode 直接加载的 Git package；不复制配置文件，不依赖 Claude Code 或 Codex 的插件格式。
+这个版本把 Amagi 的攻坚型协作框架映射为 OpenCode 运行时能力，不需要把文件复制到 `~/.config/opencode`：
 
-## 一键安装
+- 1 个 primary Leader 与 12 个专业 SubAgent
+- L0 Leader 入口、57 个 canonical 资源/模板、7 条规则
+- 8 个按需加载的 Agent Skill
+- 11 个 `/command`
+- 6 个 MCP 定义
+- 危险命令、非法 JSON、敏感提交三个原生守卫
+- SubAgent 调用统计与压缩续接上下文
+
+转换来源和资产数量记录在 `manifest/upstream.json`。
+
+## 安装
 
 全局安装：
 
@@ -12,22 +22,41 @@
 opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#main --global
 ```
 
-OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec 写入全局 `opencode.json.plugin`。重新启动 OpenCode 后生效。
+更新：
 
-项目级安装时去掉 `--global`。
+```bash
+opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#main --global --force
+```
 
-## 用户模型配置
+需要 OpenCode >= 1.18.5 和 Node.js >= 20。
 
-插件启动时会自动创建并读取用户配置文件。这是稳定的用户覆盖层，不在插件缓存中，更新插件不会覆盖已有文件。
+## Agent 与模型分层
 
-- macOS / Linux：`~/.config/opencode/amagi-opencode.json`（尊重 `XDG_CONFIG_HOME`）
-- Windows：`%USERPROFILE%\\.config\\opencode\\amagi-opencode.json`，与 OpenCode 的全局配置路径一致
-- `OPENCODE_CONFIG_DIR` 或 `OPENCODE_CONFIG` 已配置时：与该自定义目录或配置文件相邻
-- `AMAGI_OPENCODE_CONFIG`：指定精确文件路径
+| 类型 | 默认模型 | Agent |
+|---|---|---|
+| leader | `openai/gpt-5.6-terra` | amagi-leader |
+| expert | `openai/gpt-5.6-sol` | fuxi、diting、puti、hongjun |
+| worker | `zhipuai/glm-5.2` | luban、luoshen、laojun、wukong、cangjie |
+| fast | `zhipuai/glm-5-turbo` | baize、wenqu、taibai |
 
-`1.3.0` 曾错误在 Windows 使用 `%APPDATA%\\opencode`。升级到 `1.3.1` 后，若新目标不存在，插件会自动迁移该旧文件到正确位置；已有正确位置文件绝不覆盖。
+插件通过 `config` hook 注册 Agent。SubAgent 的 `task` 权限固定为 `deny`，防止递归分派；Leader 可以按任务档、执行模式和风险选择单 Agent 或多个并行 SubAgent。
 
-自动创建的文件包含如下可直接编辑的示例。`tiers` 用于批量覆盖同层 Agent；`agents` 用于只覆盖某一个具名 Agent。示例中的 `hongjun` 已实际生效，若不需要该例外配置可直接删除这一整个条目。
+上游 Claude Agent Teams 的转换规则：
+
+- `agent_team` 表示由 Leader 调度多个 OpenCode SubAgent，可用 background task 并行独立方向。
+- 所有通信、依赖和 artifact 交接都经过 Leader；OpenCode 没有 Claude Agent Teams 的 P2P mailbox。
+- OpenCode task 不接受 `isolation: worktree`。需要隔离时，Leader/taibai 先显式创建 worktree，再把绝对路径写入 Task Contract。
+
+## 用户配置
+
+插件首次启动会创建：
+
+- macOS / Linux：`~/.config/opencode/amagi-opencode.json`
+- Windows：`%USERPROFILE%\.config\opencode\amagi-opencode.json`
+- 设置 `OPENCODE_CONFIG_DIR` / `OPENCODE_CONFIG` 时：与 OpenCode 自定义配置相邻
+- 设置 `AMAGI_OPENCODE_CONFIG` 时：使用指定文件
+
+默认配置：
 
 ```json
 {
@@ -45,78 +74,104 @@ OpenCode 会使用 Bun 从 GitHub 获取并缓存插件，同时把 package spec
 }
 ```
 
-要改一个 Agent，只需在 `agents` 中使用 Agent 名作为键。例如将 `hongjun` 改用其他已配置 Provider/模型：
+优先级从低到高：内置 profile → `tiers` → `agents` → `opencode.json.agent.<name>`。字段设为 `null` 可移除继承值。
 
-```json
-{
-  "agents": {
-    "hongjun": {
-      "model": "your-provider/your-model",
-      "variant": "high"
-    }
-  }
-}
+使用 `profile: "inherit"` 并清空 `tiers` / `agents`，可让 Amagi Agent 继承 OpenCode 当前模型。
+
+## Skills、命令与 canonical 资源
+
+插件把 `skills/` 作为 OpenCode skill path 注册，OpenCode 会通过原生 `skill` 工具按需加载：
+
+- agent-document-output
+- amagi-video-analysis
+- execution-plan
+- project-knowledge-builder
+- requirement-analysis
+- switch-project
+- update-tactical-book
+- workflow
+
+11 个上游命令也会注册到 `config.command`，例如：
+
+```text
+/load-session
+/save-session
+/pull-all-repos
+/push-all-repos
+/github-release
 ```
 
-保留其他顶层字段；该片段是对完整配置文件中 `agents` 字段的替换，不是第二个配置文件。Agent 名可取 `amagi-leader`、`fuxi`、`diting`、`puti`、`hongjun`、`luban`、`luoshen`、`laojun`、`wukong`、`cangjie`、`taibai`、`baize`、`wenqu`。
+命令以 `commands/` 中实际文件为准；`workflow` 是按需加载的 Skill，不是斜杠命令。
 
-优先级从低到高：插件内置 profile、`tiers`、`agents`、`opencode.json.agent.<name>`。将字段设为 `null` 可移除 profile 继承值。若要使用 `inherit` profile 让 Agent 继承 OpenCode 模型，同时将 `tiers` 和 `agents` 设为 `{}`，避免这些显式覆盖继续生效。配置文件只会在首次缺失时创建，之后更新插件或重启 OpenCode 都不会覆盖你的修改。
+Agent prompt 中的 canonical 指针不会假装是当前项目文件。需要细则时调用自定义工具 `amagi_resource`：
 
-可用 `AMAGI_OPENCODE_CONFIG=/absolute/file.json` 指定其他配置文件。
+```text
+amagi_resource({ resource: "workflow" })
+amagi_resource({ resource: "resources/core/common/quality-standards.md" })
+amagi_resource({ resource: "skills/workflow/templates/workflow-template.md" })
+```
+
+工具只允许读取包内的 `resources/`、`rules/` 和 `skills/`，不能越界访问插件其他文件。
+
+## 原生守卫
+
+Claude hooks 已转换为 OpenCode plugin hooks：
+
+| 上游能力 | OpenCode 转换 |
+|---|---|
+| blocking-command-guard | `tool.execute.before` 阻止无限循环、stdin 等待、超长 sleep 和危险进程/删除命令 |
+| commit-guard | `tool.execute.before` 在 `git commit` 前检查 staged 文件；`-a/--all` 时同时检查 tracked unstaged 文件 |
+| json-syntax-guard | `tool.execute.after` 校验 write/edit/apply_patch 产生的 `.json` |
+| agent-invocation-counter | task 调用时写入用户配置目录旁的 `amagi-agent-stats.json` |
+| SessionStart 安装 CLAUDE/resources/rules | 改为运行时 prompt、skill path、command 与 `amagi_resource` 注册，无全局文件覆盖 |
+| 会话续接 | compaction hook 保留目标、Task Contract、artifact、验证证据、风险与下一 Gate |
+
+上游依赖 Claude transcript 格式的旧式 `SubagentStop` 文档同步和 Stop 自动续跑没有直接照搬；OpenCode 版用显式 artifact 契约、task 结果和 compaction 上下文实现可审计续接，避免解析错误的运行时格式。
 
 ## MCP
 
-插件会注册 `memory`、`web-search-prime`、`zread`、`web-reader`、`tavily-mcp` 和 `firecrawl-mcp`。运行时内置默认值全部禁用；首次自动创建的用户配置会按上方模板启用 `web-search-prime`、`zread` 和 `web-reader`，其余保持禁用。按自己的 Provider、网络和凭据情况调整。
+默认内置：
 
-在 `~/.config/opencode/amagi-opencode.json` 中按需启用；密钥使用环境变量，不要写入 Git 仓库或配置文件：
+- memory
+- web-search-prime
+- zread
+- web-reader
+- tavily-mcp
+- firecrawl-mcp
 
-```json
-{
-  "mcp": {
-    "memory": {"enabled": true},
-    "web-search-prime": {"enabled": true},
-    "tavily-mcp": {"enabled": true},
-    "firecrawl-mcp": {"enabled": true}
-  }
-}
-```
+首次生成的用户配置默认启用三个智谱远程 MCP，其余关闭。密钥只从环境变量读取：
 
 ```bash
-export ZHIPU_MCP_API_KEY='...'
+export ZHIPU_API_KEY='...'
 export TAVILY_API_KEY='...'
 export FIRECRAWL_API_KEY='...'
 ```
 
-优先级从低到高：插件内置 MCP 定义、`amagi-opencode.json.mcp`、`opencode.json.mcp`。后两层可以覆盖 `enabled`、`headers`、`environment` 或 `timeout`。
+旧的 `ZHIPU_MCP_API_KEY` 仍作为兼容别名支持；新配置应使用上游一致的 `ZHIPU_API_KEY`。
 
-## 运行时结构
+## 从上游重新转换
 
-| 层级 | 默认模型 | Agent |
-|---|---|---|
-| leader | `openai/gpt-5.6-terra` | amagi-leader |
-| expert | `openai/gpt-5.6-sol` | fuxi、diting、puti、hongjun |
-| worker | `zhipuai/glm-5.2` | luban、luoshen、laojun、wukong、cangjie、taibai |
-| fast | `zhipuai/glm-5-turbo` | baize、wenqu |
-
-插件通过 OpenCode `config` hook 在内存中注册 1 个 primary Leader 与 12 个 subagent，不把 Agent 或 prompt 写入用户配置目录。
-
-- 用户在 `opencode.json.agent.<name>` 中设置的 `model`、`variant` 和模型参数优先。
-- 用户已有的非 Amagi Agent、Provider、MCP、权限和 instructions 不受影响。
-- 用户已有非 Amagi `default_agent` 时保留；未设置时使用 `amagi-leader`。
-- 设置环境变量 `AMAGI_OPENCODE_PROFILE=inherit` 可让所有 Amagi Agent 继承 OpenCode 的模型选择。
-
-## 更新
+转换脚本可重复执行：
 
 ```bash
-opencode plugin github:runrunrain/amagi-opencode-plugins-marketplace#main --global --force
+npm run sync:upstream
 ```
+
+也可以指定其他 Amagi 源目录：
+
+```bash
+node scripts/sync-upstream.mjs /absolute/path/to/plugins/amagi
+```
+
+脚本会重建 prompts、commands、skills、resources、rules、MCP 和上游 provenance；OpenCode 运行时代码、权限映射、用户配置与测试保持独立。
 
 ## 验证
 
 ```bash
 npm test
 npm run validate
+npm pack --dry-run
 opencode agent list
 ```
 
-`opencode agent list` 应显示 `amagi-leader (primary)` 以及 12 个 Amagi subagent。
+`opencode agent list` 应显示 `amagi-leader (primary)` 与 12 个 Amagi SubAgent。

@@ -1,0 +1,358 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/tactical-book-schema.json",
+  "title": "Tactical Book Schema",
+  "description": "战术手册索引 - 精妙技巧、实用方法、实战经验的JSON Schema定义",
+  "type": "object",
+  "required": [
+    "projectId",
+    "version",
+    "lastUpdated",
+    "categories",
+    "usageStats",
+    "metadata"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema引用"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "项目唯一标识符",
+      "pattern": "^[a-z0-9-]+$",
+      "example": "my-awesome-project"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件版本号 (语义化版本)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601格式)",
+      "format": "date",
+      "example": "2025-01-15"
+    },
+    "description": {
+      "type": "string",
+      "description": "战术手册描述",
+      "example": "战术手册索引 - 精妙技巧、实用方法、实战经验"
+    },
+    "categories": {
+      "type": "array",
+      "description": "战术分类列表",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "file",
+          "priority"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "分类ID",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "techniques"
+          },
+          "name": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "技巧集"
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "实战中总结的精妙技巧和方法"
+          },
+          "file": {
+            "type": "string",
+            "description": "分类对应的文件",
+            "example": "techniques.json"
+          },
+          "priority": {
+            "type": "string",
+            "description": "优先级",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "条目数量",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "usageStats": {
+      "type": "object",
+      "description": "使用统计配置",
+      "required": [
+        "file"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "使用统计文件路径",
+          "example": "usage-stats.json"
+        },
+        "autoLoadThreshold": {
+          "type": "number",
+          "description": "自动加载阈值（百分位）",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 70
+        },
+        "progressiveDisclosure": {
+          "type": "boolean",
+          "description": "是否启用渐进式显示",
+          "default": true
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元数据信息",
+      "properties": {
+        "totalTechniques": {
+          "type": "integer",
+          "description": "技巧总数",
+          "minimum": 0
+        },
+        "highFrequency": {
+          "type": "integer",
+          "description": "高频使用技巧数量",
+          "minimum": 0
+        },
+        "mediumFrequency": {
+          "type": "integer",
+          "description": "中频使用技巧数量",
+          "minimum": 0
+        },
+        "lowFrequency": {
+          "type": "integer",
+          "description": "低频使用技巧数量",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "definitions": {
+    "techniqueItem": {
+      "type": "object",
+      "description": "技巧条目定义",
+      "required": [
+        "id",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "技巧ID",
+          "pattern": "^tech-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "技巧标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "技巧描述"
+        },
+        "category": {
+          "type": "string",
+          "description": "所属分类"
+        },
+        "difficulty": {
+          "type": "string",
+          "description": "难度等级",
+          "enum": [
+            "beginner",
+            "intermediate",
+            "advanced",
+            "expert"
+          ]
+        },
+        "usage": {
+          "type": "string",
+          "description": "使用场景"
+        },
+        "example": {
+          "type": "string",
+          "description": "使用示例"
+        },
+        "tags": {
+          "type": "array",
+          "description": "标签列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "frequency": {
+          "type": "integer",
+          "description": "使用频率计数",
+          "minimum": 0,
+          "default": 0
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "patternItem": {
+      "type": "object",
+      "description": "设计模式条目定义",
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "模式ID",
+          "pattern": "^pattern-[a-z0-9-]+-\\d+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "模式名称"
+        },
+        "description": {
+          "type": "string",
+          "description": "模式描述"
+        },
+        "type": {
+          "type": "string",
+          "description": "模式类型",
+          "enum": [
+            "creational",
+            "structural",
+            "behavioral"
+          ]
+        },
+        "useCase": {
+          "type": "string",
+          "description": "使用场景"
+        },
+        "implementation": {
+          "type": "string",
+          "description": "实现说明"
+        },
+        "example": {
+          "type": "string",
+          "description": "代码示例"
+        }
+      }
+    },
+    "snippetItem": {
+      "type": "object",
+      "description": "代码片段条目定义",
+      "required": [
+        "id",
+        "title",
+        "code"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "片段ID",
+          "pattern": "^snippet-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "片段标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "片段描述"
+        },
+        "language": {
+          "type": "string",
+          "description": "编程语言",
+          "example": "javascript"
+        },
+        "code": {
+          "type": "string",
+          "description": "代码内容"
+        },
+        "tags": {
+          "type": "array",
+          "description": "标签列表",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "description": "检查清单条目定义",
+      "required": [
+        "id",
+        "title",
+        "items"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "清单ID",
+          "pattern": "^checklist-[a-z0-9-]+-\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "清单标题"
+        },
+        "description": {
+          "type": "string",
+          "description": "清单描述"
+        },
+        "category": {
+          "type": "string",
+          "description": "清单分类"
+        },
+        "items": {
+          "type": "array",
+          "description": "检查项列表",
+          "items": {
+            "type": "object",
+            "required": [
+              "task"
+            ],
+            "properties": {
+              "task": {
+                "type": "string",
+                "description": "检查任务"
+              },
+              "checked": {
+                "type": "boolean",
+                "description": "是否已检查",
+                "default": false
+              },
+              "notes": {
+                "type": "string",
+                "description": "备注"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

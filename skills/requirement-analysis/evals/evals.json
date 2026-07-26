@@ -1,0 +1,54 @@
+{
+  "skill_name": "requirement-analysis",
+  "schema_version": "2.0",
+  "target": { "type": "skill", "name": "requirement-analysis" },
+  "evals": [
+    {
+      "id": "fuzzy-intent-clarification",
+      "prompt": "我想做一个多模块的用户登录功能，要支持 OAuth2 和本地密码，还得有执行计划和验收标准。你帮我看看。",
+      "expected_output": "触发 requirement-analysis，产出讨论稿式澄清文档：提炼核心意图、区分显性需求与隐性推导、指出真实困难（如 OAuth2 与本地密码并存的取舍留白、验收标准其实没定义）、给方向性思路（不给方案）、列分优先级的待确认清单。不写技术方案/数据结构/架构/实施计划。",
+      "files": [],
+      "target": { "type": "skill", "name": "requirement-analysis" },
+      "behavior_tags": ["skill.requirement_analysis", "planning.requirement_first"],
+      "split": "smoke",
+      "scorer": {
+        "type": "keyword",
+        "pass_criteria": ["产出讨论稿式澄清文档", "区分显性需求与隐性推导", "包含待确认清单且分优先级", "指出真实困难或留白", "邀请用户确认或纠正"],
+        "must_not_include": ["技术方案", "技术选型", "数据结构定义", "接口定义", "架构设计", "实施计划", "里程碑", "function ", "import ", "class "]
+      },
+      "harness_path": "evidence_path",
+      "risk_level": "high"
+    },
+    {
+      "id": "negative-simple-fix-no-analysis",
+      "prompt": "把 README.md 里的版本号从 1.0 改成 2.0。",
+      "expected_output": "不该触发 requirement-analysis；这是简单单点改动，直接做。",
+      "files": [],
+      "target": { "type": "skill", "name": "requirement-analysis" },
+      "behavior_tags": ["boundary.negative", "skill.requirement_analysis"],
+      "split": "smoke",
+      "scorer": {
+        "type": "keyword",
+        "must_not_include": ["requirement-analysis", "需求分析", "待确认清单", "讨论稿"]
+      },
+      "harness_path": "default_fast_path",
+      "risk_level": "low"
+    },
+    {
+      "id": "boundary-wants-direct-solution-no-analysis",
+      "prompt": "需求已经清楚了，你直接给我设计这个登录模块的技术方案和数据库表结构吧。",
+      "expected_output": "不该触发 requirement-analysis；用户明确要直接产出技术方案/设计，那不是需求分析的职责。应直接进入设计/实现，而非绕回去产出讨论稿。",
+      "files": [],
+      "target": { "type": "skill", "name": "requirement-analysis" },
+      "behavior_tags": ["boundary.negative", "skill.requirement_analysis"],
+      "split": "targeted",
+      "scorer": {
+        "type": "keyword",
+        "must_not_include": ["讨论稿式澄清", "待确认清单", "想要什么", "不想要什么"],
+        "pass_criteria": ["直接进入设计或方案", "不产出需求讨论稿"]
+      },
+      "harness_path": "default_fast_path",
+      "risk_level": "medium"
+    }
+  ]
+}

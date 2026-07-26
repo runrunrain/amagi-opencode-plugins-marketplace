@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "项目开发清单 (Development Checklist)",
+  "description": "基于 Anthropic 长效Agent框架设计，用于跟踪项目开发进度和任务管理",
+  "version": "9.4",
+  "lastUpdated": "2026-02-10",
+
+  "root": {
+    "type": "object",
+    "required": ["project", "checklist", "metadata"],
+    "properties": {
+      "project": {
+        "type": "object",
+        "description": "项目基本信息",
+        "required": ["id", "name", "version"],
+        "properties": {
+          "id": { "type": "string", "description": "项目ID (kebab-case)" },
+          "name": { "type": "string", "description": "项目名称" },
+          "version": { "type": "string", "description": "当前版本号" },
+          "description": { "type": "string", "description": "项目描述" }
+        }
+      },
+
+      "metadata": {
+        "type": "object",
+        "description": "清单元数据",
+        "required": ["createdDate", "lastUpdated", "totalSessions"],
+        "properties": {
+          "createdDate": { "type": "string", "format": "date", "description": "创建日期" },
+          "lastUpdated": { "type": "string", "format": "date", "description": "最后更新日期" },
+          "totalSessions": { "type": "integer", "description": "总会话数" },
+          "completedSessions": { "type": "integer", "description": "完成会话数" },
+          "currentSessionId": { "type": "string", "description": "当前会话ID" }
+        }
+      },
+
+      "checklist": {
+        "type": "object",
+        "description": "开发清单主体",
+        "required": ["features", "bugs", "improvements", "tests"],
+        "properties": {
+          "features": {
+            "type": "array",
+            "description": "功能开发清单",
+            "items": {
+              "$ref": "#/$defs/checklistItem"
+            }
+          },
+          "bugs": {
+            "type": "array",
+            "description": "Bug修复清单",
+            "items": {
+              "$ref": "#/$defs/checklistItem"
+            }
+          },
+          "improvements": {
+            "type": "array",
+            "description": "改进优化清单",
+            "items": {
+              "$ref": "#/$defs/checklistItem"
+            }
+          },
+          "tests": {
+            "type": "array",
+            "description": "测试用例清单",
+            "items": {
+              "$ref": "#/$defs/testItem"
+            }
+          }
+        }
+      },
+
+      "sessionProgress": {
+        "type": "array",
+        "description": "会话进度记录",
+        "items": {
+          "$ref": "#/$defs/sessionRecord"
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "checklistItem": {
+      "type": "object",
+      "required": ["id", "category", "description", "status", "priority"],
+      "properties": {
+        "id": { "type": "string", "description": "唯一标识符" },
+        "category": { "type": "string", "description": "功能分类" },
+        "description": { "type": "string", "description": "功能描述" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "failed", "skipped"],
+          "description": "状态"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["p0", "p1", "p2", "p3"],
+          "description": "优先级"
+        },
+        "createdDate": { "type": "string", "format": "date", "description": "创建日期" },
+        "completedDate": { "type": "string", "format": "date", "description": "完成日期" },
+        "sessionId": { "type": "string", "description": "完成的会话ID" },
+        "steps": {
+          "type": "array",
+          "description": "实现步骤",
+          "items": {
+            "type": "object",
+            "required": ["description", "passed"],
+            "properties": {
+              "description": { "type": "string", "description": "步骤描述" },
+              "passed": { "type": "boolean", "description": "是否通过" },
+              "notes": { "type": "string", "description": "备注" }
+            }
+          }
+        },
+        "assignedAgent": { "type": "string", "description": "负责的Agent" },
+        "dependencies": {
+          "type": "array",
+          "description": "依赖项（其他item的id）",
+          "items": { "type": "string" }
+        },
+        "testIds": {
+          "type": "array",
+          "description": "关联的测试ID",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string", "description": "额外说明" }
+      }
+    },
+
+    "testItem": {
+      "type": "object",
+      "required": ["id", "description", "status"],
+      "properties": {
+        "id": { "type": "string", "description": "测试ID" },
+        "description": { "type": "string", "description": "测试描述" },
+        "type": {
+          "type": "string",
+          "enum": ["unit", "integration", "e2e", "manual"],
+          "description": "测试类型"
+        },
+        "targetItemId": { "type": "string", "description": "关联的开发项ID" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "passed", "failed", "skipped"],
+          "description": "测试状态"
+        },
+        "createdDate": { "type": "string", "format": "date", "description": "创建日期" },
+        "passedDate": { "type": "string", "format": "date", "description": "通过日期" },
+        "errorLog": { "type": "string", "description": "错误日志" },
+        "sessionId": { "type": "string", "description": "执行的会话ID" }
+      }
+    },
+
+    "sessionRecord": {
+      "type": "object",
+      "required": ["sessionId", "date", "itemsCompleted"],
+      "properties": {
+        "sessionId": { "type": "string", "description": "会话ID" },
+        "date": { "type": "string", "format": "date", "description": "会话日期" },
+        "itemsCompleted": {
+          "type": "array",
+          "description": "完成的项ID列表",
+          "items": { "type": "string" }
+        },
+        "itemsFailed": {
+          "type": "array",
+          "description": "失败的项ID列表",
+          "items": { "type": "string" }
+        },
+        "testsRun": { "type": "integer", "description": "运行的测试数" },
+        "testsPassed": { "type": "integer", "description": "通过的测试数" },
+        "summary": { "type": "string", "description": "会话总结" }
+      }
+    }
+  }
+}

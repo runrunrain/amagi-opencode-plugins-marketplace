@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/task-index-schema.json",
+  "title": "Task Index Schema",
+  "description": "项目任务索引文件 task-index.json 的 JSON Schema 定义。存储任务摘要列表和最近变更记录，详细任务内容按需从 tasks/ 目录读取。",
+  "type": "object",
+  "required": [
+    "version",
+    "lastUpdated",
+    "recentChangelog",
+    "tasks"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema 引用"
+    },
+    "version": {
+      "type": "string",
+      "description": "文件格式版本号",
+      "example": "1.0"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "description": "最后更新日期 (ISO 8601 格式)",
+      "format": "date",
+      "example": "2026-03-17"
+    },
+    "recentChangelog": {
+      "type": "array",
+      "description": "最近变更记录，上限 20 条，超出时裁剪最旧条目",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": [
+          "date",
+          "summary",
+          "type"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "变更日期 (ISO 8601 格式)",
+            "format": "date",
+            "example": "2026-03-17"
+          },
+          "summary": {
+            "type": "string",
+            "description": "变更内容一句话描述",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "description": "变更类型",
+            "enum": [
+              "feat",
+              "fix",
+              "refactor",
+              "docs",
+              "chore",
+              "test"
+            ]
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "任务索引列表（仅包含摘要信息，详情从 tasks/{filePath} 按需读取）",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "date",
+          "status",
+          "type",
+          "priority",
+          "filePath",
+          "summary"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "任务唯一 ID，格式：task-{YYYYMMDD}-{seq}",
+            "pattern": "^task-\\d{8}-\\d{3,}$",
+            "example": "task-20260317-001"
+          },
+          "title": {
+            "type": "string",
+            "description": "任务标题",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "date": {
+            "type": "string",
+            "description": "任务日期 (ISO 8601 格式)",
+            "format": "date",
+            "example": "2026-03-17"
+          },
+          "status": {
+            "type": "string",
+            "description": "任务状态",
+            "enum": [
+              "completed",
+              "in-progress",
+              "blocked",
+              "cancelled"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "任务类型",
+            "enum": [
+              "feature",
+              "bugfix",
+              "optimization",
+              "test",
+              "docs"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "description": "任务优先级",
+            "enum": [
+              "P0",
+              "P1",
+              "P2"
+            ]
+          },
+          "filePath": {
+            "type": "string",
+            "description": "任务详情文件的相对路径（相对于项目元数据目录）",
+            "pattern": "^tasks/task-\\d{8}-\\d{3,}\\.json$",
+            "example": "tasks/task-20260317-001.json"
+          },
+          "summary": {
+            "type": "string",
+            "description": "任务一句话摘要，不超过 100 字",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

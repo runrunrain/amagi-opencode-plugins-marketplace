@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../core/schemas/error-book-schema.json",
+  "projectId": "{project-id}",
+  "version": "1.0",
+  "lastUpdated": "2026-02-10",
+  "description": "错误手册索引 - 问题记录、解决方案、经验教训",
+  "summaryFields": ["id", "name", "description", "itemCount"],
+  "detailFields": ["file"],
+  "categories": [
+    {
+      "id": "problems",
+      "name": "问题记录",
+      "description": "遇到的问题和故障",
+      "file": "problems.json",
+      "itemCount": 0
+    },
+    {
+      "id": "solutions",
+      "name": "解决方案",
+      "description": "问题的解决方案和修复方法",
+      "file": "solutions.json",
+      "itemCount": 0
+    },
+    {
+      "id": "preventions",
+      "name": "预防措施",
+      "description": "避免问题再次发生的措施",
+      "file": "preventions.json",
+      "itemCount": 0
+    }
+  ],
+  "statistics": {
+    "totalProblems": 0,
+    "resolvedProblems": 0,
+    "recurringProblems": 0,
+    "highSeverityProblems": 0,
+    "averageResolutionTime": 0
+  },
+  "metadata": {
+    "trackingEnabled": true,
+    "trackingStartDate": "{YYYY-MM-DD}"
+  }
+}

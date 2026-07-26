@@ -2,17 +2,18 @@ import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
+import { tool } from "@opencode-ai/plugin"
+
+import { createResourceReader, loadCommands } from "./lib/assets.js"
+import { assertCommitSafe, assertJsonFile, assertSafeCommand } from "./lib/guards.js"
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const specification = readJson("manifest/agents.json")
 const mcpSpecification = readJson("mcp/servers.json")
-const instructionNames = [
-  "00-baseline.md",
-  "10-orchestration.md",
-  "20-task-contract.md",
-  "30-quality-gates.md",
-  "40-artifact-contract.md",
-]
+const upstreamProfile = readJson("manifest/upstream-orchestration-profile.json")
+const upstream = readJson("manifest/upstream.json")
+const commandSpecification = loadCommands(root)
+const resourceReader = createResourceReader(root)
 
 function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8").trim()
@@ -160,11 +161,8 @@ function applyOverrides(target, ...overrides) {
   return result
 }
 
-function buildPrompt(name, mode) {
-  const role = read(`prompts/${name}.md`)
-  const selected = mode === "primary" ? instructionNames : ["00-baseline.md", "20-task-contract.md"]
-  const rules = selected.map((file) => read(`instructions/${file}`)).join("\n\n")
-  return `${role}\n\n${rules}`
+function buildPrompt(name) {
+  return read(`prompts/${name}.md`)
 }
 
 function buildAgents(profile, userConfig) {
@@ -178,7 +176,7 @@ function buildAgents(profile, userConfig) {
         {
           description: agent.description,
           mode: agent.mode,
-          prompt: buildPrompt(name, agent.mode),
+          prompt: buildPrompt(name),
           permission: agent.permission,
           ...configured,
         },
@@ -189,7 +187,10 @@ function buildAgents(profile, userConfig) {
 
 function resolveEnvironmentTemplates(value) {
   if (typeof value === "string") {
-    return value.replace(/\{env:([A-Z0-9_]+)\}/g, (_match, name) => process.env[name] || "")
+    return value.replace(/\{env:([A-Z0-9_]+)\}/g, (_match, name) => {
+      if (name === "ZHIPU_API_KEY") return process.env.ZHIPU_API_KEY || process.env.ZHIPU_MCP_API_KEY || ""
+      return process.env[name] || ""
+    })
   }
   if (Array.isArray(value)) return value.map(resolveEnvironmentTemplates)
   if (value && typeof value === "object") {
@@ -210,6 +211,15 @@ function mergeMcp(base, override) {
   return resolveEnvironmentTemplates(merged)
 }
 
+function mergePermissions(managed, existing) {
+  const merged = {
+    ...managed,
+    ...(typeof existing === "string" ? { "*": existing } : existing || {}),
+  }
+  if (managed.task !== undefined) merged.task = managed.task
+  return merged
+}
+
 function buildMcp(userConfig) {
   return Object.fromEntries(
     Object.entries(mcpSpecification.servers).map(([name, server]) => [name, mergeMcp(server, userConfig.mcp?.[name])]),
@@ -217,13 +227,30 @@ function buildMcp(userConfig) {
 }
 
 export const AmagiOpenCodePlugin = async (_context, options = {}) => {
-  const { data: userConfig } = readUserConfig(options)
+  const { file: userConfigFile, data: userConfig } = readUserConfig(options)
   validateOverrides(userConfig)
   const profile = resolveProfile(options, userConfig)
   const agents = buildAgents(profile, userConfig)
   const mcpServers = buildMcp(userConfig)
+  const projectDirectory = _context?.directory || process.cwd()
+  const skillsPath = path.join(root, "skills")
+
+  const amagiResource = tool({
+    description: `读取 Amagi ${upstream.version} 的 canonical 规则、协作资源或技能附件。推荐资源 ID：${resourceReader.ids.join(", ")}`,
+    args: {
+      resource: tool.schema.string().describe(
+        "资源 ID，或 resources/、rules/、skills/ 下的插件内相对路径",
+      ),
+    },
+    async execute({ resource }) {
+      return resourceReader.read(resource)
+    },
+  })
 
   return {
+    tool: {
+      amagi_resource: amagiResource,
+    },
     config: async (config) => {
       config.agent ||= {}
       for (const [name, managed] of Object.entries(agents)) {
@@ -234,10 +261,7 @@ export const AmagiOpenCodePlugin = async (_context, options = {}) => {
           description: managed.description,
           mode: managed.mode,
           prompt: managed.prompt,
-          permission: {
-            ...managed.permission,
-            ...(existing.permission || {}),
-          },
+          permission: mergePermissions(managed.permission, existing.permission),
         }
       }
 
@@ -246,11 +270,89 @@ export const AmagiOpenCodePlugin = async (_context, options = {}) => {
         config.mcp[name] = mergeMcp(managed, config.mcp[name])
       }
 
+      config.command ||= {}
+      for (const [name, managed] of Object.entries(commandSpecification)) {
+        config.command[name] = {
+          ...managed,
+          ...(config.command[name] || {}),
+        }
+      }
+
+      config.skills ||= {}
+      config.skills.paths = [...new Set([...(config.skills.paths || []), skillsPath])]
+
       if (!config.default_agent) {
         if (userConfig.default_agent !== false) {
           config.default_agent = userConfig.default_agent || specification.leader
         }
       }
     },
+    "tool.execute.before": async (input, output) => {
+      if (input.tool === "bash") {
+        const command = String(output.args?.command || "")
+        assertSafeCommand(command)
+        assertCommitSafe(command, projectDirectory, upstreamProfile.commit_guard)
+      }
+      if (input.tool === "task") {
+        recordAgentInvocation(userConfigFile, output.args)
+      }
+    },
+    "tool.execute.after": async (input) => {
+      const files = modifiedJsonFiles(input.tool, input.args, projectDirectory)
+      for (const file of files) assertJsonFile(file)
+    },
+    "experimental.session.compacting": async (_input, output) => {
+      output.context.push(
+        [
+          `Amagi ${upstream.version} continuation contract: preserve the user's objective, task tier, current execution/review mode,`,
+          "Task Contracts, required artifact absolute paths, changed files, validation evidence, unresolved risks,",
+          "active SubAgent task IDs, and the exact next gate. Do not mark unverified work complete after compaction.",
+        ].join(" "),
+      )
+    },
+  }
+}
+
+function modifiedJsonFiles(toolName, args, directory) {
+  if (["write", "edit"].includes(toolName) && args?.filePath) {
+    const file = path.isAbsolute(args.filePath) ? args.filePath : path.join(directory, args.filePath)
+    return file.toLowerCase().endsWith(".json") ? [file] : []
+  }
+  if (toolName !== "apply_patch" || typeof args?.patchText !== "string") return []
+  return [...args.patchText.matchAll(/^\*\*\* (?:Add|Update) File: (.+\.json)\s*$/gim)]
+    .map((match) => match[1].trim())
+    .map((file) => path.isAbsolute(file) ? file : path.join(directory, file))
+}
+
+function recordAgentInvocation(configFile, args) {
+  const agent = args?.subagent_type
+  if (typeof agent !== "string" || !Object.hasOwn(specification.agents, agent)) return
+  const tier = String(args?.prompt || "").match(/\[TASK_TIER:\s*(simple|medium|complex)\]/i)?.[1]?.toLowerCase() || "medium"
+  const statsFile = path.join(path.dirname(configFile), "amagi-agent-stats.json")
+  let data = { version: 1, total_invocations: 0, agents: {} }
+  try {
+    data = JSON.parse(fs.readFileSync(statsFile, "utf8"))
+  } catch {
+    // The observation hook is best-effort and starts from an empty document.
+  }
+  const now = new Date().toISOString()
+  const current = data.agents?.[agent]?.[tier] || { count: 0, first_seen: now }
+  current.count += 1
+  current.last_seen = now
+  data.total_invocations = (data.total_invocations || 0) + 1
+  data.last_updated = now
+  data.agents ||= {}
+  data.agents[agent] ||= {}
+  data.agents[agent][tier] = current
+  const temporary = `${statsFile}.${process.pid}.${Date.now()}.tmp`
+  try {
+    fs.writeFileSync(temporary, `${JSON.stringify(data, null, 2)}\n`)
+    fs.renameSync(temporary, statsFile)
+  } catch {
+    try {
+      fs.unlinkSync(temporary)
+    } catch {
+      // Statistics must never block task execution.
+    }
   }
 }
